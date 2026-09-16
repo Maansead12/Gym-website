@@ -1,0 +1,139 @@
+.hero {
+    min-height: calc(100vh - 80px);
+
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.72),
+            rgba(0, 0, 0, 0.72)),
+        url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1800&auto=format&fit=crop&q=85");
+
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    padding: 80px 30px;
+
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hero content */
+.hero-content {
+    max-width: 900px;
+    animation: heroFade 1s ease;
+}
+
+/* Small heading */
+.hero-content span {
+    display: block;
+    color: #ff6600;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+}
+
+/* Main heading */
+.hero-content h1 {
+    color: white;
+    font-size: clamp(55px, 8vw, 100px);
+    line-height: 1;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+}
+
+/* Orange part of heading */
+.hero-content h1 strong {
+    color: #ff6600;
+    display: block;
+}
+
+/* Description */
+.hero-content p {
+    color: #ddd;
+    font-size: 20px;
+    line-height: 1.7;
+    max-width: 700px;
+    margin: 0 auto 35px;
+}
+
+/* Join button */
+.hero-content button {
+    padding: 17px 42px;
+
+    background: #ff6600;
+    color: white;
+
+    border: none;
+    border-radius: 10px;
+
+    font-size: 18px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.hero-content button:hover {
+    background: #ff8c1a;
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(255, 102, 0, 0.35);
+}
+
+/* Animation */
+@keyframes heroFade {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+
+    .hero {
+        min-height: calc(100vh - 80px);
+        padding: 60px 20px;
+        background-attachment: scroll;
+    }
+
+    .hero-content h1 {
+        font-size: 55px;
+    }
+
+    .hero-content p {
+        font-size: 17px;
+    }
+
+    .hero-content button {
+        padding: 15px 35px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+
+    .hero-content h1 {
+        font-size: 42px;
+    }
+
+    .hero-content p {
+        font-size: 16px;
+    }
+
+    .hero-content span {
+        font-size: 14px;
+        letter-spacing: 2px;
+    }
+}

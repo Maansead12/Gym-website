@@ -1,0 +1,203 @@
+.about {
+    min-height: 650px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 70px;
+
+    padding: 100px 80px;
+
+    background: #181818;
+}
+
+/* Left side */
+.about-text {
+    flex: 1;
+    max-width: 650px;
+}
+
+.about-text h2 {
+    color: #ff6600;
+    font-size: 50px;
+    font-weight: 800;
+
+    margin-bottom: 25px;
+}
+
+.about-text p {
+    color: #ccc;
+    font-size: 18px;
+    line-height: 1.8;
+
+    margin-bottom: 20px;
+}
+
+/* Statistics */
+.stats {
+    display: flex;
+    gap: 50px;
+
+    margin-top: 40px;
+}
+
+.stats div {
+    text-align: left;
+}
+
+.stats h3 {
+    color: #ff6600;
+    font-size: 38px;
+
+    margin-bottom: 5px;
+}
+
+.stats p {
+    color: #aaa;
+    font-size: 15px;
+
+    margin: 0;
+}
+
+/* About Button */
+.about-btn {
+    margin-top: 25px;
+
+    padding: 14px 30px;
+
+    background: #ff6600;
+    color: white;
+
+    border: none;
+    border-radius: 8px;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.about-btn:hover {
+    background: #ff8c1a;
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 8px 20px rgba(255, 102, 0, 0.25);
+}
+
+/* Image side */
+.about-image {
+    flex: 1;
+    max-width: 600px;
+
+    position: relative;
+}
+
+.about-image img {
+    width: 100%;
+    height: 450px;
+
+    object-fit: cover;
+
+    border-radius: 20px;
+
+    display: block;
+
+    transition: 0.4s;
+
+    position: relative;
+    z-index: 1;
+}
+
+.about-image:hover img {
+    transform: scale(1.03);
+}
+
+/* Orange border effect */
+.about-image::after {
+    content: "";
+
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+
+    border: 2px solid #ff6600;
+    border-radius: 20px;
+
+    top: 15px;
+    left: 15px;
+
+    z-index: 0;
+
+    pointer-events: none;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+
+    .about {
+        flex-direction: column;
+
+        padding: 80px 40px;
+    }
+
+    .about-text {
+        max-width: 100%;
+
+        text-align: center;
+    }
+
+    .stats {
+        justify-content: center;
+    }
+
+    .about-image {
+        width: 100%;
+
+        max-width: 600px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+
+    .about {
+        padding: 70px 25px;
+
+        gap: 50px;
+    }
+
+    .about-text h2 {
+        font-size: 40px;
+    }
+
+    .about-text p {
+        font-size: 16px;
+    }
+
+    .stats {
+        gap: 25px;
+    }
+
+    .stats h3 {
+        font-size: 30px;
+    }
+
+    .stats p {
+        font-size: 13px;
+    }
+
+    .about-btn {
+        padding: 13px 25px;
+
+        font-size: 15px;
+    }
+
+    .about-image img {
+        height: 350px;
+    }
+}

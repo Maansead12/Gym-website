@@ -1,0 +1,401 @@
+/* =========================
+   PROGRAMS PAGE
+========================= */
+
+.programs-page {
+    background: #111;
+    color: white;
+}
+
+
+/* =========================
+   HERO
+========================= */
+
+.programs-hero {
+    min-height: 500px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    padding: 80px 30px;
+
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.75),
+            rgba(0, 0, 0, 0.75)),
+        url("https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=1800&auto=format&fit=crop&q=85");
+
+    background-size: cover;
+    background-position: center;
+}
+
+.programs-hero-content {
+    max-width: 850px;
+}
+
+.programs-hero-content>p:first-child {
+    color: #ff6600;
+
+    font-size: 15px;
+    font-weight: bold;
+
+    letter-spacing: 4px;
+
+    margin-bottom: 20px;
+}
+
+.programs-hero h1 {
+    font-size: clamp(55px, 8vw, 90px);
+
+    line-height: 1;
+
+    margin-bottom: 30px;
+
+    font-weight: 800;
+}
+
+.programs-hero h1 span {
+    color: #ff6600;
+}
+
+.programs-hero-description {
+    color: #ddd;
+
+    font-size: 20px;
+
+    line-height: 1.7;
+
+    max-width: 700px;
+
+    margin: auto;
+}
+
+
+/* =========================
+   PROGRAMS SECTION
+========================= */
+
+.programs-section {
+    max-width: 1400px;
+
+    margin: auto;
+
+    padding: 110px 60px;
+}
+
+.programs-header {
+    text-align: center;
+
+    max-width: 750px;
+
+    margin: 0 auto 65px;
+}
+
+.section-label {
+    color: #ff6600;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 15px;
+}
+
+.programs-header h2 {
+    font-size: 50px;
+
+    margin-bottom: 20px;
+}
+
+.programs-header h2 span {
+    color: #ff6600;
+}
+
+.programs-header>p:last-child {
+    color: #aaa;
+
+    font-size: 17px;
+
+    line-height: 1.8;
+}
+
+
+/* =========================
+   PROGRAM GRID
+========================= */
+
+.programs-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 30px;
+}
+
+
+/* =========================
+   PROGRAM CARD
+========================= */
+
+.program-page-card {
+    background: #1c1c1c;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+
+    border: 1px solid #292929;
+
+    transition: 0.4s;
+}
+
+.program-page-card:hover {
+    transform: translateY(-10px);
+
+    border-color: #ff6600;
+
+    box-shadow:
+        0 15px 40px rgba(255, 102, 0, 0.18);
+}
+
+
+/* Image */
+
+.program-image {
+    height: 250px;
+
+    position: relative;
+
+    overflow: hidden;
+}
+
+.program-image img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    display: block;
+
+    transition: 0.5s;
+}
+
+.program-page-card:hover .program-image img {
+    transform: scale(1.08);
+}
+
+
+/* Icon */
+
+.program-icon {
+    position: absolute;
+
+    bottom: 15px;
+    left: 20px;
+
+    width: 55px;
+    height: 55px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: #ff6600;
+
+    border-radius: 50%;
+
+    font-size: 27px;
+
+    border: 3px solid #111;
+}
+
+
+/* Card content */
+
+.program-card-content {
+    padding: 30px;
+}
+
+.program-card-content h3 {
+    color: white;
+
+    font-size: 24px;
+
+    margin-bottom: 15px;
+}
+
+.program-card-content p {
+    color: #aaa;
+
+    font-size: 15px;
+
+    line-height: 1.7;
+
+    min-height: 75px;
+
+    margin-bottom: 25px;
+}
+
+
+/* Button */
+
+.program-card-content button {
+    width: 100%;
+
+    padding: 14px;
+
+    background: transparent;
+
+    color: #ff6600;
+
+    border: 1px solid #ff6600;
+
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.program-card-content button:hover {
+    background: #ff6600;
+
+    color: white;
+}
+
+
+/* =========================
+   CTA
+========================= */
+
+.programs-cta {
+    background: #1a1a1a;
+
+    text-align: center;
+
+    padding: 100px 30px;
+}
+
+.programs-cta h2 {
+    font-size: 50px;
+
+    margin-bottom: 20px;
+}
+
+.programs-cta h2 span {
+    color: #ff6600;
+}
+
+.programs-cta>p:not(.section-label) {
+    color: #aaa;
+
+    font-size: 18px;
+
+    max-width: 650px;
+
+    margin: 0 auto 30px;
+
+    line-height: 1.8;
+}
+
+.programs-cta button {
+    padding: 16px 40px;
+
+    background: #ff6600;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 10px;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.programs-cta button:hover {
+    background: #ff8c1a;
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 10px 25px rgba(255, 102, 0, 0.3);
+}
+
+
+/* =========================
+   TABLET
+========================= */
+
+@media (max-width: 1000px) {
+
+    .programs-section {
+        padding: 80px 40px;
+    }
+
+    .programs-grid {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 600px) {
+
+    .programs-hero {
+        min-height: 450px;
+
+        padding: 60px 20px;
+    }
+
+    .programs-hero h1 {
+        font-size: 48px;
+    }
+
+    .programs-hero-description {
+        font-size: 16px;
+    }
+
+    .programs-section {
+        padding: 70px 25px;
+    }
+
+    .programs-header h2 {
+        font-size: 38px;
+    }
+
+    .programs-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .program-image {
+        height: 230px;
+    }
+
+    .programs-cta {
+        padding: 80px 25px;
+    }
+
+    .programs-cta h2 {
+        font-size: 38px;
+    }
+}

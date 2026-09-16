@@ -1,0 +1,350 @@
+/* =========================
+   ABOUT PAGE
+========================= */
+
+.about-page {
+    background: #111;
+    color: white;
+}
+
+
+/* =========================
+   HERO
+========================= */
+
+.about-hero {
+    min-height: 500px;
+
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.72)),
+        url("https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&auto=format&fit=crop&q=85");
+
+    background-size: cover;
+    background-position: center;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.about-hero-content {
+    max-width: 900px;
+}
+
+.about-hero-content>p:first-child {
+    color: #ff6600;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+}
+
+.about-hero h1 {
+    font-size: 70px;
+    margin: 0;
+    line-height: 1.1;
+}
+
+.about-hero h1 span {
+    color: #ff6600;
+}
+
+.about-hero-description {
+    color: #ddd;
+    font-size: 20px;
+    line-height: 1.7;
+    max-width: 700px;
+    margin: 25px auto 0;
+}
+
+
+/* =========================
+   ABOUT MAIN
+========================= */
+
+.about-main {
+    display: flex;
+    align-items: center;
+    gap: 70px;
+
+    padding: 100px 80px;
+
+    max-width: 1400px;
+    margin: auto;
+}
+
+.about-image {
+    flex: 1;
+}
+
+.about-image img {
+    width: 100%;
+    height: 500px;
+
+    object-fit: cover;
+
+    border-radius: 20px;
+
+    box-shadow: 0 0 35px rgba(255, 102, 0, 0.15);
+}
+
+.about-content {
+    flex: 1;
+}
+
+.section-label {
+    color: #ff6600;
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+}
+
+.about-content h2 {
+    font-size: 48px;
+    margin-bottom: 25px;
+}
+
+.about-content h2 span {
+    color: #ff6600;
+}
+
+.about-content p:not(.section-label) {
+    color: #bbb;
+    font-size: 17px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+}
+
+.about-content button,
+.about-cta button {
+    margin-top: 15px;
+
+    padding: 15px 30px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: #ff6600;
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.about-content button:hover,
+.about-cta button:hover {
+    background: #ff8533;
+    transform: translateY(-3px);
+}
+
+
+/* =========================
+   STATISTICS
+========================= */
+
+.about-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 25px;
+
+    padding: 70px 80px;
+
+    background: #1a1a1a;
+}
+
+.stat {
+    text-align: center;
+    padding: 30px;
+}
+
+.stat h2 {
+    color: #ff6600;
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.stat p {
+    color: #bbb;
+    font-size: 16px;
+}
+
+
+/* =========================
+   MISSION
+========================= */
+
+.mission {
+    padding: 100px 80px;
+    background: #111;
+}
+
+.mission-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.mission-header h2 {
+    font-size: 48px;
+    margin: 0;
+}
+
+.mission-header h2 span {
+    color: #ff6600;
+}
+
+.mission-cards {
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 30px;
+
+    max-width: 1200px;
+    margin: auto;
+}
+
+.mission-card {
+    background: #1e1e1e;
+
+    padding: 40px 30px;
+
+    border-radius: 18px;
+
+    text-align: center;
+
+    transition: 0.3s;
+
+    border: 1px solid #292929;
+}
+
+.mission-card:hover {
+    transform: translateY(-10px);
+
+    border-color: #ff6600;
+
+    box-shadow: 0 0 30px rgba(255, 102, 0, 0.2);
+}
+
+.mission-icon {
+    font-size: 50px;
+    margin-bottom: 20px;
+}
+
+.mission-card h3 {
+    color: #ff6600;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+.mission-card p {
+    color: #aaa;
+    line-height: 1.7;
+}
+
+
+/* =========================
+   CALL TO ACTION
+========================= */
+
+.about-cta {
+    text-align: center;
+
+    padding: 110px 20px;
+
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
+        url("https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?w=1600&auto=format&fit=crop&q=85");
+
+    background-size: cover;
+    background-position: center;
+}
+
+.about-cta h2 {
+    font-size: 52px;
+    margin: 10px 0 20px;
+}
+
+.about-cta h2 span {
+    color: #ff6600;
+}
+
+.about-cta>p:not(.section-label) {
+    color: #ccc;
+    font-size: 18px;
+    margin-bottom: 25px;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+
+    .about-main {
+        flex-direction: column;
+        padding: 70px 30px;
+    }
+
+    .about-image img {
+        height: 400px;
+    }
+
+    .about-hero h1 {
+        font-size: 50px;
+    }
+
+    .about-stats {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 60px 30px;
+    }
+
+    .mission {
+        padding: 70px 30px;
+    }
+
+    .mission-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .about-cta h2 {
+        font-size: 40px;
+    }
+}
+
+
+@media (max-width: 600px) {
+
+    .about-hero {
+        min-height: 450px;
+    }
+
+    .about-hero h1 {
+        font-size: 38px;
+    }
+
+    .about-hero-description {
+        font-size: 16px;
+    }
+
+    .about-content h2 {
+        font-size: 36px;
+    }
+
+    .about-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .about-cta h2 {
+        font-size: 32px;
+    }
+}
