@@ -8,9 +8,11 @@ function Signup() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [message, setMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
-    function handleSignup(event) {
+    async function handleSignup(event) {
         event.preventDefault();
+        setMessage("");
 
         if (!name || !email || !password || !confirmPassword) {
             setMessage("Please fill in all fields.");
@@ -27,17 +29,52 @@ function Signup() {
             return;
         }
 
-        setMessage("Account created successfully! 💪");
+        try {
+            setIsLoading(true);
+
+            const response = await fetch(
+                "http://localhost:5000/api/auth/signup",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        name: name.trim(),
+                        email: email.trim().toLowerCase(),
+                        password,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setMessage(data.message || "Signup failed.");
+                return;
+            }
+
+            setMessage("Account created successfully! 💪");
+
+            setName("");
+            setEmail("");
+            setPassword("");
+            setConfirmPassword("");
+        } catch (error) {
+            console.error("Signup error:", error);
+            setMessage(
+                "Unable to connect to the server. Please try again."
+            );
+        } finally {
+            setIsLoading(false);
+        }
     }
 
     return (
         <div className="signup-page">
-
             <div className="signup-container">
 
-                {/* Left Side */}
                 <div className="signup-left">
-
                     <p className="signup-label">
                         JOIN FITZONE
                     </p>
@@ -53,11 +90,8 @@ function Signup() {
                         step toward becoming stronger, healthier, and
                         more confident.
                     </p>
-
                 </div>
 
-
-                {/* Sign Up Card */}
                 <div className="signup-card">
 
                     <div className="signup-logo">
@@ -70,10 +104,8 @@ function Signup() {
                         Join our fitness community
                     </p>
 
-
                     <form onSubmit={handleSignup}>
 
-                        {/* Name */}
                         <div className="signup-input-group">
                             <label>Full Name</label>
 
@@ -81,12 +113,12 @@ function Signup() {
                                 type="text"
                                 placeholder="Enter your full name"
                                 value={name}
-                                onChange={(event) => setName(event.target.value)}
+                                onChange={(event) =>
+                                    setName(event.target.value)
+                                }
                             />
                         </div>
 
-
-                        {/* Email */}
                         <div className="signup-input-group">
                             <label>Email Address</label>
 
@@ -94,12 +126,12 @@ function Signup() {
                                 type="email"
                                 placeholder="Enter your email"
                                 value={email}
-                                onChange={(event) => setEmail(event.target.value)}
+                                onChange={(event) =>
+                                    setEmail(event.target.value)
+                                }
                             />
                         </div>
 
-
-                        {/* Password */}
                         <div className="signup-input-group">
                             <label>Password</label>
 
@@ -107,12 +139,12 @@ function Signup() {
                                 type="password"
                                 placeholder="Create a password"
                                 value={password}
-                                onChange={(event) => setPassword(event.target.value)}
+                                onChange={(event) =>
+                                    setPassword(event.target.value)
+                                }
                             />
                         </div>
 
-
-                        {/* Confirm Password */}
                         <div className="signup-input-group">
                             <label>Confirm Password</label>
 
@@ -126,13 +158,16 @@ function Signup() {
                             />
                         </div>
 
-
-                        <button type="submit">
-                            Create Account →
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                        >
+                            {isLoading
+                                ? "Creating Account..."
+                                : "Create Account →"}
                         </button>
 
                     </form>
-
 
                     {message && (
                         <p className="signup-message">
@@ -140,24 +175,19 @@ function Signup() {
                         </p>
                     )}
 
-
                     <div className="signup-divider">
                         <span>OR</span>
                     </div>
 
-
                     <p className="login-link">
-                        Already have an account?
-
+                        Already have an account?{" "}
                         <Link to="/login">
-                            {" "}Login
+                            Login
                         </Link>
                     </p>
 
                 </div>
-
             </div>
-
         </div>
     );
 }

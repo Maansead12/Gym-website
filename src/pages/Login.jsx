@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import "./Login.css";
 
 function Login() {
@@ -37,7 +38,6 @@ function Login() {
           </p>
         </div>
 
-
         <div className="login-card">
 
           <div className="login-logo">
@@ -49,7 +49,6 @@ function Login() {
           <p className="login-subtitle">
             Access your fitness account
           </p>
-
 
           <form onSubmit={handleLogin}>
 
@@ -64,7 +63,6 @@ function Login() {
               />
             </div>
 
-
             <div className="input-group">
               <label>Password</label>
 
@@ -75,7 +73,6 @@ function Login() {
                 onChange={(event) => setPassword(event.target.value)}
               />
             </div>
-
 
             <div className="login-options">
 
@@ -90,13 +87,11 @@ function Login() {
 
             </div>
 
-
             <button type="submit">
               Login →
             </button>
 
           </form>
-
 
           {message && (
             <p className="login-message">
@@ -104,17 +99,15 @@ function Login() {
             </p>
           )}
 
-
           <div className="login-divider">
             <span>OR</span>
           </div>
 
-
           <p className="signup-text">
-            Don't have an account?
-            <a href="#" onClick={(event) => event.preventDefault()}>
-              {" "}Create Account
-            </a>
+            Don't have an account?{" "}
+            <Link to="/signup">
+              Create Account
+            </Link>
           </p>
 
         </div>
