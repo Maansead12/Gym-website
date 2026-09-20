@@ -4,7 +4,11 @@ import "./Dashboard.css";
 
 function Dashboard() {
     const navigate = useNavigate();
+
     const [user, setUser] = useState(null);
+    const [dashboard, setDashboard] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         const token = localStorage.getItem("fitzone_token");
@@ -15,12 +19,74 @@ function Dashboard() {
             return;
         }
 
-        setUser(JSON.parse(savedUser));
+        const currentUser = JSON.parse(savedUser);
+        setUser(currentUser);
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch(
+                    "http://localhost:5000/api/dashboard",
+                    {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        localStorage.removeItem("fitzone_token");
+                        localStorage.removeItem("fitzone_user");
+                        navigate("/login");
+                        return;
+                    }
+
+                    throw new Error(
+                        data.message || "Failed to load dashboard"
+                    );
+                }
+
+                setDashboard(data);
+            } catch (error) {
+                console.error("Dashboard error:", error);
+                setError(
+                    "Unable to load your dashboard data."
+                );
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        loadDashboard();
     }, [navigate]);
 
-    if (!user) {
-        return null;
+    if (!user || loading) {
+        return (
+            <div className="dashboard-loading">
+                <h2>Loading Dashboard...</h2>
+            </div>
+        );
     }
+
+    if (error) {
+        return (
+            <div className="dashboard-loading">
+                <h2>{error}</h2>
+                <button onClick={() => window.location.reload()}>
+                    Try Again
+                </button>
+            </div>
+        );
+    }
+
+    const membership = dashboard?.membership;
+    const workoutCount = dashboard?.workoutCount || 0;
+    const progress = dashboard?.progress;
+    const recentWorkouts = dashboard?.recentWorkouts || [];
 
     return (
         <div className="dashboard-page">
@@ -43,19 +109,33 @@ function Dashboard() {
 
                     <div className="dashboard-card">
                         <h3>Membership</h3>
-                        <strong>ACTIVE</strong>
-                        <p>FitZone Member</p>
+
+                        <strong>
+                            {membership?.status
+                                ? membership.status.toUpperCase()
+                                : "NO PLAN"}
+                        </strong>
+
+                        <p>
+                            {membership?.plan || "No membership yet"}
+                        </p>
                     </div>
 
                     <div className="dashboard-card">
                         <h3>Workouts</h3>
-                        <strong>12</strong>
+
+                        <strong>{workoutCount}</strong>
+
                         <p>This Month</p>
                     </div>
 
                     <div className="dashboard-card">
                         <h3>Progress</h3>
-                        <strong>78%</strong>
+
+                        <strong>
+                            {progress?.goal_percentage || 0}%
+                        </strong>
+
                         <p>Monthly Goal</p>
                     </div>
 
@@ -65,29 +145,38 @@ function Dashboard() {
 
                     <h2>Recent Activity</h2>
 
-                    <div className="activity-item">
-                        <span>🏋️</span>
-                        <div>
-                            <strong>Strength Training</strong>
-                            <p>Completed workout</p>
+                    {recentWorkouts.length === 0 ? (
+                        <div className="activity-empty">
+                            <p>No workouts recorded yet.</p>
+                            <span>
+                                Your workouts will appear here.
+                            </span>
                         </div>
-                    </div>
+                    ) : (
+                        recentWorkouts.map((workout) => (
+                            <div
+                                className="activity-item"
+                                key={workout.id}
+                            >
+                                <span>🏋️</span>
 
-                    <div className="activity-item">
-                        <span>💪</span>
-                        <div>
-                            <strong>Chest Workout</strong>
-                            <p>Completed workout</p>
-                        </div>
-                    </div>
+                                <div>
+                                    <strong>
+                                        {workout.workout_name}
+                                    </strong>
 
-                    <div className="activity-item">
-                        <span>🏃</span>
-                        <div>
-                            <strong>Cardio</strong>
-                            <p>Completed workout</p>
-                        </div>
-                    </div>
+                                    <p>
+                                        {workout.workout_type ||
+                                            "Workout"}
+
+                                        {workout.duration
+                                            ? ` • ${workout.duration} min`
+                                            : ""}
+                                    </p>
+                                </div>
+                            </div>
+                        ))
+                    )}
 
                 </section>
 
