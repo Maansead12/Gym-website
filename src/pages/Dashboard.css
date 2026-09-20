@@ -20,11 +20,12 @@
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 4px;
-    margin-bottom: 10px;
+    margin: 0 0 18px;
 }
 
 .dashboard-welcome h1 {
     font-size: 60px;
+    line-height: 1.1;
     margin: 0;
     font-weight: 500;
 }
@@ -36,8 +37,11 @@
 .dashboard-welcome p:last-child {
     color: #999;
     font-size: 18px;
-    margin-top: 5px;
+    line-height: 1.5;
+    margin: 18px 0 0;
 }
+
+/* DASHBOARD CARDS */
 
 .dashboard-cards {
     display: grid;
@@ -69,6 +73,8 @@
     font-size: 18px;
     margin-top: 15px;
 }
+
+/* RECENT ACTIVITY */
 
 .dashboard-activity {
     margin-top: 65px;
@@ -109,6 +115,8 @@
     color: #777;
 }
 
+/* MOBILE */
+
 @media (max-width: 800px) {
     .dashboard-content {
         width: 90%;
@@ -117,6 +125,10 @@
 
     .dashboard-welcome h1 {
         font-size: 40px;
+    }
+
+    .dashboard-welcome p:last-child {
+        margin-top: 14px;
     }
 
     .dashboard-cards {
