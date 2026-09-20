@@ -1,7 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
 function Navbar() {
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("fitzone_token");
+  const isLoggedIn = !!token;
+
+  function handleLogout() {
+    localStorage.removeItem("fitzone_token");
+    localStorage.removeItem("fitzone_user");
+
+    navigate("/login");
+  }
+
   return (
     <nav className="navbar">
       <div className="logo">FITZONE</div>
@@ -18,11 +30,28 @@ function Navbar() {
         <li>
           <Link to="/programs">Programs</Link>
         </li>
+
+        {isLoggedIn && (
+          <li>
+            <Link to="/dashboard">Dashboard</Link>
+          </li>
+        )}
       </ul>
 
-      <Link to="/login">
-        <button className="login-btn">Login</button>
-      </Link>
+      {isLoggedIn ? (
+        <button
+          className="login-btn"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
+      ) : (
+        <Link to="/login">
+          <button className="login-btn">
+            Login
+          </button>
+        </Link>
+      )}
     </nav>
   );
 }

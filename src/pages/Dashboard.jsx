@@ -18,39 +18,12 @@ function Dashboard() {
         setUser(JSON.parse(savedUser));
     }, [navigate]);
 
-    function handleLogout() {
-        localStorage.removeItem("fitzone_token");
-        localStorage.removeItem("fitzone_user");
-
-        navigate("/login");
-    }
-
     if (!user) {
         return null;
     }
 
     return (
         <div className="dashboard-page">
-
-            <header className="dashboard-header">
-                <div className="dashboard-logo">
-                    FITZONE
-                </div>
-
-                <nav>
-                    <button onClick={() => navigate("/")}>
-                        Home
-                    </button>
-
-                    <button onClick={() => navigate("/programs")}>
-                        Programs
-                    </button>
-
-                    <button onClick={handleLogout}>
-                        Logout
-                    </button>
-                </nav>
-            </header>
 
             <main className="dashboard-content">
 
