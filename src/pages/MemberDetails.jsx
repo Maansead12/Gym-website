@@ -14,18 +14,48 @@ function MemberDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // Edit member
+    /* =========================
+       EDIT MEMBER
+    ========================= */
+
     const [editName, setEditName] = useState("");
     const [editEmail, setEditEmail] = useState("");
     const [editRole, setEditRole] = useState("member");
     const [editMessage, setEditMessage] = useState("");
     const [updatingMember, setUpdatingMember] = useState(false);
 
-    // Delete member
+    /* =========================
+       DELETE MEMBER
+    ========================= */
+
     const [deleteMessage, setDeleteMessage] = useState("");
     const [deletingMember, setDeletingMember] = useState(false);
-    const [showDeleteConfirm, setShowDeleteConfirm] =
-        useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+    /* =========================
+       MEMBERSHIP
+    ========================= */
+
+    const [membershipPlan, setMembershipPlan] = useState("Basic");
+    const [membershipStatus, setMembershipStatus] = useState("active");
+    const [membershipStartDate, setMembershipStartDate] = useState("");
+    const [membershipEndDate, setMembershipEndDate] = useState("");
+    const [membershipMessage, setMembershipMessage] = useState("");
+    const [updatingMembership, setUpdatingMembership] = useState(false);
+
+    /* =========================
+       PROGRESS
+    ========================= */
+
+    const [progressGoal, setProgressGoal] = useState("0");
+    const [progressWeight, setProgressWeight] = useState("");
+    const [progressNotes, setProgressNotes] = useState("");
+    const [progressMessage, setProgressMessage] = useState("");
+    const [updatingProgress, setUpdatingProgress] = useState(false);
+
+    /* =========================
+       LOAD MEMBER
+    ========================= */
 
     useEffect(() => {
         const token = localStorage.getItem("fitzone_token");
@@ -68,7 +98,6 @@ function MemberDetails() {
                 if (response.status === 401) {
                     localStorage.removeItem("fitzone_token");
                     localStorage.removeItem("fitzone_user");
-
                     navigate("/login");
                     return;
                 }
@@ -91,17 +120,42 @@ function MemberDetails() {
             setEditName(data.member?.name || "");
             setEditEmail(data.member?.email || "");
             setEditRole(data.member?.role || "member");
-        } catch (error) {
-            console.error(
-                "Member details error:",
-                error
+
+            setMembershipPlan(data.membership?.plan || "Basic");
+            setMembershipStatus(data.membership?.status || "active");
+            setMembershipStartDate(
+                data.membership?.start_date || ""
+            );
+            setMembershipEndDate(
+                data.membership?.end_date || ""
             );
 
+            setProgressGoal(
+                data.progress?.goal_percentage !== undefined &&
+                    data.progress?.goal_percentage !== null
+                    ? String(data.progress.goal_percentage)
+                    : "0"
+            );
+
+            setProgressWeight(
+                data.progress?.weight !== undefined &&
+                    data.progress?.weight !== null
+                    ? String(data.progress.weight)
+                    : ""
+            );
+
+            setProgressNotes(data.progress?.notes || "");
+        } catch (error) {
+            console.error("Member details error:", error);
             setError("Unable to load member details.");
         } finally {
             setLoading(false);
         }
     }
+
+    /* =========================
+       UPDATE MEMBER
+    ========================= */
 
     async function handleUpdateMember(event) {
         event.preventDefault();
@@ -121,9 +175,7 @@ function MemberDetails() {
         try {
             setUpdatingMember(true);
 
-            const token = localStorage.getItem(
-                "fitzone_token"
-            );
+            const token = localStorage.getItem("fitzone_token");
 
             const response = await fetch(
                 `http://localhost:5000/api/admin/members/${id}`,
@@ -147,7 +199,6 @@ function MemberDetails() {
                 if (response.status === 401) {
                     localStorage.removeItem("fitzone_token");
                     localStorage.removeItem("fitzone_user");
-
                     navigate("/login");
                     return;
                 }
@@ -165,7 +216,6 @@ function MemberDetails() {
             }
 
             setMember(data.member);
-
             setEditName(data.member.name);
             setEditEmail(data.member.email);
             setEditRole(data.member.role);
@@ -174,10 +224,7 @@ function MemberDetails() {
                 "Member updated successfully! ✓"
             );
         } catch (error) {
-            console.error(
-                "Update member error:",
-                error
-            );
+            console.error("Update member error:", error);
 
             setEditMessage(
                 "Unable to connect to the server."
@@ -187,15 +234,250 @@ function MemberDetails() {
         }
     }
 
+    /* =========================
+       UPDATE MEMBERSHIP
+    ========================= */
+
+    async function handleUpdateMembership(event) {
+        event.preventDefault();
+
+        setMembershipMessage("");
+
+        if (!membershipPlan) {
+            setMembershipMessage(
+                "Please select a membership plan."
+            );
+            return;
+        }
+
+        if (!membershipStatus) {
+            setMembershipMessage(
+                "Please select a membership status."
+            );
+            return;
+        }
+
+        if (!membershipStartDate) {
+            setMembershipMessage(
+                "Please select a start date."
+            );
+            return;
+        }
+
+        if (
+            membershipEndDate &&
+            membershipEndDate < membershipStartDate
+        ) {
+            setMembershipMessage(
+                "End date cannot be before the start date."
+            );
+            return;
+        }
+
+        try {
+            setUpdatingMembership(true);
+
+            const token = localStorage.getItem("fitzone_token");
+
+            const response = await fetch(
+                `http://localhost:5000/api/admin/members/${id}/membership`,
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        plan: membershipPlan,
+                        status: membershipStatus,
+                        start_date: membershipStartDate,
+                        end_date: membershipEndDate || null,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    localStorage.removeItem("fitzone_token");
+                    localStorage.removeItem("fitzone_user");
+                    navigate("/login");
+                    return;
+                }
+
+                if (response.status === 403) {
+                    navigate("/dashboard");
+                    return;
+                }
+
+                setMembershipMessage(
+                    data.message || "Failed to update membership."
+                );
+
+                return;
+            }
+
+            setMembership(data.membership);
+            setMembershipPlan(data.membership.plan);
+            setMembershipStatus(data.membership.status);
+            setMembershipStartDate(
+                data.membership.start_date || ""
+            );
+            setMembershipEndDate(
+                data.membership.end_date || ""
+            );
+
+            setMembershipMessage(
+                "Membership updated successfully! ✓"
+            );
+        } catch (error) {
+            console.error(
+                "Update membership error:",
+                error
+            );
+
+            setMembershipMessage(
+                "Unable to connect to the server."
+            );
+        } finally {
+            setUpdatingMembership(false);
+        }
+    }
+
+    /* =========================
+       UPDATE PROGRESS
+    ========================= */
+
+    async function handleUpdateProgress(event) {
+        event.preventDefault();
+
+        setProgressMessage("");
+
+        if (
+            progressGoal === "" ||
+            progressGoal === null
+        ) {
+            setProgressMessage(
+                "Goal percentage is required."
+            );
+            return;
+        }
+
+        const goal = Number(progressGoal);
+
+        if (
+            Number.isNaN(goal) ||
+            goal < 0 ||
+            goal > 100
+        ) {
+            setProgressMessage(
+                "Goal percentage must be between 0 and 100."
+            );
+            return;
+        }
+
+        if (
+            progressWeight !== "" &&
+            Number(progressWeight) <= 0
+        ) {
+            setProgressMessage(
+                "Weight must be greater than 0."
+            );
+            return;
+        }
+
+        try {
+            setUpdatingProgress(true);
+
+            const token = localStorage.getItem("fitzone_token");
+
+            const response = await fetch(
+                `http://localhost:5000/api/admin/members/${id}/progress`,
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        goal_percentage: goal,
+                        weight:
+                            progressWeight === ""
+                                ? null
+                                : Number(progressWeight),
+                        notes: progressNotes.trim(),
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    localStorage.removeItem("fitzone_token");
+                    localStorage.removeItem("fitzone_user");
+                    navigate("/login");
+                    return;
+                }
+
+                if (response.status === 403) {
+                    navigate("/dashboard");
+                    return;
+                }
+
+                setProgressMessage(
+                    data.message || "Failed to update progress."
+                );
+
+                return;
+            }
+
+            setProgress(data.progress);
+
+            setProgressGoal(
+                String(data.progress.goal_percentage ?? 0)
+            );
+
+            setProgressWeight(
+                data.progress.weight !== null &&
+                    data.progress.weight !== undefined
+                    ? String(data.progress.weight)
+                    : ""
+            );
+
+            setProgressNotes(
+                data.progress.notes || ""
+            );
+
+            setProgressMessage(
+                "Progress updated successfully! ✓"
+            );
+        } catch (error) {
+            console.error(
+                "Update progress error:",
+                error
+            );
+
+            setProgressMessage(
+                "Unable to connect to the server."
+            );
+        } finally {
+            setUpdatingProgress(false);
+        }
+    }
+
+    /* =========================
+       DELETE MEMBER
+    ========================= */
+
     async function handleDeleteMember() {
         setDeleteMessage("");
 
         try {
             setDeletingMember(true);
 
-            const token = localStorage.getItem(
-                "fitzone_token"
-            );
+            const token = localStorage.getItem("fitzone_token");
 
             const response = await fetch(
                 `http://localhost:5000/api/admin/members/${id}`,
@@ -214,7 +496,6 @@ function MemberDetails() {
                 if (response.status === 401) {
                     localStorage.removeItem("fitzone_token");
                     localStorage.removeItem("fitzone_user");
-
                     navigate("/login");
                     return;
                 }
@@ -233,7 +514,6 @@ function MemberDetails() {
             }
 
             setShowDeleteConfirm(false);
-
             navigate("/admin");
         } catch (error) {
             console.error(
@@ -250,6 +530,10 @@ function MemberDetails() {
             setDeletingMember(false);
         }
     }
+
+    /* =========================
+       LOADING
+    ========================= */
 
     if (loading) {
         return (
@@ -277,6 +561,8 @@ function MemberDetails() {
         <div className="member-details-page">
             <main className="member-details-content">
 
+                {/* BACK */}
+
                 <button
                     className="back-admin-btn"
                     onClick={() => navigate("/admin")}
@@ -289,9 +575,7 @@ function MemberDetails() {
                 <section className="member-profile-header">
                     <p>MEMBER PROFILE</p>
 
-                    <h1>
-                        {member?.name}
-                    </h1>
+                    <h1>{member?.name}</h1>
 
                     <span
                         className={`member-role-badge ${member?.role === "admin"
@@ -379,15 +663,193 @@ function MemberDetails() {
                     )}
                 </section>
 
-                {/* DELETE MEMBER */}
+                {/* MEMBERSHIP MANAGEMENT */}
+
+                <section className="member-info-section">
+                    <h2>Membership Management</h2>
+
+                    <p className="edit-member-description">
+                        Create or update this member's gym membership.
+                    </p>
+
+                    <form
+                        className="edit-member-form"
+                        onSubmit={handleUpdateMembership}
+                    >
+                        <div className="edit-input-group">
+                            <label>Membership Plan</label>
+
+                            <select
+                                value={membershipPlan}
+                                onChange={(event) =>
+                                    setMembershipPlan(event.target.value)
+                                }
+                            >
+                                <option value="Basic">Basic</option>
+                                <option value="Premium">Premium</option>
+                                <option value="Pro">Pro</option>
+                            </select>
+                        </div>
+
+                        <div className="edit-input-group">
+                            <label>Status</label>
+
+                            <select
+                                value={membershipStatus}
+                                onChange={(event) =>
+                                    setMembershipStatus(event.target.value)
+                                }
+                            >
+                                <option value="active">Active</option>
+                                <option value="expired">Expired</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+
+                        <div className="edit-input-group">
+                            <label>Start Date</label>
+
+                            <input
+                                type="date"
+                                value={membershipStartDate}
+                                onChange={(event) =>
+                                    setMembershipStartDate(
+                                        event.target.value
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="edit-input-group">
+                            <label>End Date</label>
+
+                            <input
+                                type="date"
+                                value={membershipEndDate}
+                                min={
+                                    membershipStartDate || undefined
+                                }
+                                onChange={(event) =>
+                                    setMembershipEndDate(
+                                        event.target.value
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <button
+                            className="update-member-btn"
+                            type="submit"
+                            disabled={updatingMembership}
+                        >
+                            {updatingMembership
+                                ? "Saving Membership..."
+                                : "Save Membership →"}
+                        </button>
+                    </form>
+
+                    {membershipMessage && (
+                        <p className="edit-member-message">
+                            {membershipMessage}
+                        </p>
+                    )}
+                </section>
+
+                {/* PROGRESS MANAGEMENT */}
+
+                <section className="member-info-section">
+                    <h2>Progress Management</h2>
+
+                    <p className="edit-member-description">
+                        Maintain professional fitness progress
+                        records and member observations.
+                    </p>
+
+                    <form
+                        className="edit-member-form"
+                        onSubmit={handleUpdateProgress}
+                    >
+                        <div className="edit-input-group">
+                            <label>Goal Progress (%)</label>
+
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                value={progressGoal}
+                                onChange={(event) =>
+                                    setProgressGoal(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="0 - 100"
+                            />
+                        </div>
+
+                        <div className="edit-input-group">
+                            <label>Weight (kg)</label>
+
+                            <input
+                                type="number"
+                                min="0"
+                                step="0.1"
+                                value={progressWeight}
+                                onChange={(event) =>
+                                    setProgressWeight(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Enter current weight"
+                            />
+                        </div>
+
+                        <div className="edit-input-group progress-notes-group">
+                            <label>Progress Notes</label>
+
+                            <textarea
+                                value={progressNotes}
+                                onChange={(event) =>
+                                    setProgressNotes(
+                                        event.target.value
+                                    )
+                                }
+                                placeholder="Enter professional progress notes, observations, recommendations, or training updates..."
+                                rows="6"
+                            />
+
+                            <span className="input-help-text">
+                                Record relevant observations about
+                                training, nutrition, consistency,
+                                recovery, progress, or current goals.
+                            </span>
+                        </div>
+
+                        <button
+                            className="update-member-btn"
+                            type="submit"
+                            disabled={updatingProgress}
+                        >
+                            {updatingProgress
+                                ? "Saving Progress..."
+                                : "Save Progress →"}
+                        </button>
+                    </form>
+
+                    {progressMessage && (
+                        <p className="edit-member-message">
+                            {progressMessage}
+                        </p>
+                    )}
+                </section>
+
+                {/* DANGER ZONE */}
 
                 <section className="member-info-section delete-member-section">
                     <h2>Danger Zone</h2>
 
                     <p className="delete-description">
                         Permanently delete this member and all
-                        of their membership, progress, and
-                        workout data.
+                        of their membership, progress, and workout data.
                     </p>
 
                     <button
@@ -415,26 +877,17 @@ function MemberDetails() {
                     <div className="member-info-grid">
                         <div className="member-info-card">
                             <span>Name</span>
-
-                            <strong>
-                                {member?.name}
-                            </strong>
+                            <strong>{member?.name}</strong>
                         </div>
 
                         <div className="member-info-card">
                             <span>Email</span>
-
-                            <strong>
-                                {member?.email}
-                            </strong>
+                            <strong>{member?.email}</strong>
                         </div>
 
                         <div className="member-info-card">
                             <span>Role</span>
-
-                            <strong>
-                                {member?.role}
-                            </strong>
+                            <strong>{member?.role}</strong>
                         </div>
 
                         <div className="member-info-card">
@@ -451,60 +904,50 @@ function MemberDetails() {
                     </div>
                 </section>
 
-                {/* MEMBERSHIP */}
+                {/* CURRENT MEMBERSHIP */}
 
                 <section className="member-info-section">
-                    <h2>Membership</h2>
+                    <h2>Current Membership</h2>
 
                     {!membership ? (
                         <div className="member-empty">
                             <p>
-                                This member has no membership.
+                                This member has no membership yet.
                             </p>
                         </div>
                     ) : (
                         <div className="member-info-grid">
                             <div className="member-info-card">
                                 <span>Plan</span>
-
-                                <strong>
-                                    {membership.plan}
-                                </strong>
+                                <strong>{membership.plan}</strong>
                             </div>
 
                             <div className="member-info-card">
                                 <span>Status</span>
-
-                                <strong>
-                                    {membership.status}
-                                </strong>
+                                <strong>{membership.status}</strong>
                             </div>
 
                             <div className="member-info-card">
                                 <span>Start Date</span>
-
                                 <strong>
-                                    {membership.start_date ||
-                                        "N/A"}
+                                    {membership.start_date || "N/A"}
                                 </strong>
                             </div>
 
                             <div className="member-info-card">
                                 <span>End Date</span>
-
                                 <strong>
-                                    {membership.end_date ||
-                                        "N/A"}
+                                    {membership.end_date || "N/A"}
                                 </strong>
                             </div>
                         </div>
                     )}
                 </section>
 
-                {/* PROGRESS */}
+                {/* CURRENT PROGRESS */}
 
                 <section className="member-info-section">
-                    <h2>Progress</h2>
+                    <h2>Current Progress</h2>
 
                     {!progress ? (
                         <div className="member-empty">
@@ -533,11 +976,10 @@ function MemberDetails() {
                             </div>
 
                             <div className="member-info-card member-notes-card">
-                                <span>Notes</span>
+                                <span>Progress Notes</span>
 
                                 <strong>
-                                    {progress.notes ||
-                                        "No notes"}
+                                    {progress.notes || "No notes recorded"}
                                 </strong>
                             </div>
                         </div>
@@ -551,9 +993,7 @@ function MemberDetails() {
 
                     {workouts.length === 0 ? (
                         <div className="member-empty">
-                            <p>
-                                No workouts recorded.
-                            </p>
+                            <p>No workouts recorded.</p>
                         </div>
                     ) : (
                         <div className="member-workouts">
@@ -606,8 +1046,7 @@ function MemberDetails() {
 
                         <p>
                             Are you sure you want to permanently
-                            delete{" "}
-                            <strong>{member?.name}</strong>?
+                            delete <strong>{member?.name}</strong>?
                         </p>
 
                         <p className="delete-warning">

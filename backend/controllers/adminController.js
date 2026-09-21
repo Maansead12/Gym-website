@@ -1,5 +1,9 @@
 const supabase = require("../config/supabase");
 
+/* =========================
+   GET ALL MEMBERS
+========================= */
+
 const getAllMembers = async (req, res) => {
     try {
         const { data, error } = await supabase
@@ -26,6 +30,10 @@ const getAllMembers = async (req, res) => {
         });
     }
 };
+
+/* =========================
+   GET MEMBER DETAILS
+========================= */
 
 const getMemberDetails = async (req, res) => {
     try {
@@ -128,7 +136,9 @@ const getMemberDetails = async (req, res) => {
     }
 };
 
-/* UPDATE MEMBER */
+/* =========================
+   UPDATE MEMBER
+========================= */
 
 const updateMember = async (req, res) => {
     try {
@@ -245,7 +255,9 @@ const updateMember = async (req, res) => {
     }
 };
 
-/* DELETE MEMBER */
+/* =========================
+   DELETE MEMBER
+========================= */
 
 const deleteMember = async (req, res) => {
     try {
@@ -269,7 +281,9 @@ const deleteMember = async (req, res) => {
             error: findError,
         } = await supabase
             .from("users")
-            .select("id, name, email, role")
+            .select(
+                "id, name, email, role"
+            )
             .eq("id", id)
             .maybeSingle();
 
@@ -313,11 +327,12 @@ const deleteMember = async (req, res) => {
     }
 };
 
-/* ADMIN STATISTICS */
+/* =========================
+   ADMIN STATISTICS
+========================= */
 
 const getAdminStats = async (req, res) => {
     try {
-        // Total users
         const {
             count: totalUsers,
             error: usersError,
@@ -334,7 +349,6 @@ const getAdminStats = async (req, res) => {
             });
         }
 
-        // Active memberships
         const {
             count: activeMemberships,
             error: membershipsError,
@@ -352,7 +366,6 @@ const getAdminStats = async (req, res) => {
             });
         }
 
-        // Total workouts
         const {
             count: totalWorkouts,
             error: workoutsError,
@@ -369,7 +382,6 @@ const getAdminStats = async (req, res) => {
             });
         }
 
-        // Members with progress
         const {
             count: membersWithProgress,
             error: progressError,
@@ -386,7 +398,6 @@ const getAdminStats = async (req, res) => {
             });
         }
 
-        // Recently joined users
         const {
             data: recentMembers,
             error: recentMembersError,
@@ -411,11 +422,13 @@ const getAdminStats = async (req, res) => {
                 totalUsers: totalUsers || 0,
                 activeMemberships:
                     activeMemberships || 0,
-                totalWorkouts: totalWorkouts || 0,
+                totalWorkouts:
+                    totalWorkouts || 0,
                 membersWithProgress:
                     membersWithProgress || 0,
             },
-            recentMembers: recentMembers || [],
+            recentMembers:
+                recentMembers || [],
         });
     } catch (error) {
         console.error(
@@ -429,10 +442,351 @@ const getAdminStats = async (req, res) => {
     }
 };
 
+/* =========================
+   UPDATE MEMBER MEMBERSHIP
+========================= */
+
+const updateMemberMembership = async (
+    req,
+    res
+) => {
+    try {
+        const { id } = req.params;
+
+        const {
+            plan,
+            status,
+            start_date,
+            end_date,
+        } = req.body;
+
+        if (!id) {
+            return res.status(400).json({
+                message: "Member ID is required",
+            });
+        }
+
+        if (!plan || !status || !start_date) {
+            return res.status(400).json({
+                message:
+                    "Plan, status, and start date are required",
+            });
+        }
+
+        const validPlans = [
+            "Basic",
+            "Premium",
+            "Pro",
+        ];
+
+        const validStatuses = [
+            "active",
+            "expired",
+            "cancelled",
+        ];
+
+        if (!validPlans.includes(plan)) {
+            return res.status(400).json({
+                message: "Invalid membership plan",
+            });
+        }
+
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({
+                message: "Invalid membership status",
+            });
+        }
+
+        const {
+            data: member,
+            error: memberError,
+        } = await supabase
+            .from("users")
+            .select("id")
+            .eq("id", id)
+            .maybeSingle();
+
+        if (memberError) {
+            return res.status(500).json({
+                message: memberError.message,
+            });
+        }
+
+        if (!member) {
+            return res.status(404).json({
+                message: "Member not found",
+            });
+        }
+
+        const {
+            data: existingMembership,
+            error: membershipError,
+        } = await supabase
+            .from("memberships")
+            .select("*")
+            .eq("user_id", id)
+            .order("created_at", {
+                ascending: false,
+            })
+            .limit(1)
+            .maybeSingle();
+
+        if (membershipError) {
+            return res.status(500).json({
+                message: membershipError.message,
+            });
+        }
+
+        const membershipData = {
+            plan,
+            status,
+            start_date,
+            end_date: end_date || null,
+        };
+
+        let data;
+        let error;
+
+        if (existingMembership) {
+            const result = await supabase
+                .from("memberships")
+                .update(membershipData)
+                .eq("id", existingMembership.id)
+                .select("*")
+                .single();
+
+            data = result.data;
+            error = result.error;
+        } else {
+            const result = await supabase
+                .from("memberships")
+                .insert([
+                    {
+                        user_id: id,
+                        ...membershipData,
+                    },
+                ])
+                .select("*")
+                .single();
+
+            data = result.data;
+            error = result.error;
+        }
+
+        if (error) {
+            return res.status(500).json({
+                message: error.message,
+            });
+        }
+
+        res.status(200).json({
+            message:
+                "Membership updated successfully",
+            membership: data,
+        });
+    } catch (error) {
+        console.error(
+            "Update membership error:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Server error",
+        });
+    }
+};
+
+/* =========================
+   UPDATE MEMBER PROGRESS
+========================= */
+
+const updateMemberProgress = async (
+    req,
+    res
+) => {
+    try {
+        const { id } = req.params;
+
+        const {
+            goal_percentage,
+            weight,
+            notes,
+        } = req.body;
+
+        if (!id) {
+            return res.status(400).json({
+                message: "Member ID is required",
+            });
+        }
+
+        if (
+            goal_percentage === undefined ||
+            goal_percentage === null ||
+            goal_percentage === ""
+        ) {
+            return res.status(400).json({
+                message: "Goal percentage is required",
+            });
+        }
+
+        const goal = Number(goal_percentage);
+
+        if (Number.isNaN(goal)) {
+            return res.status(400).json({
+                message:
+                    "Goal percentage must be a number",
+            });
+        }
+
+        if (goal < 0 || goal > 100) {
+            return res.status(400).json({
+                message:
+                    "Goal percentage must be between 0 and 100",
+            });
+        }
+
+        let numericWeight = null;
+
+        if (
+            weight !== "" &&
+            weight !== null &&
+            weight !== undefined
+        ) {
+            numericWeight = Number(weight);
+
+            if (
+                Number.isNaN(numericWeight) ||
+                numericWeight <= 0
+            ) {
+                return res.status(400).json({
+                    message:
+                        "Weight must be a valid number",
+                });
+            }
+        }
+
+        /* Check member */
+
+        const {
+            data: member,
+            error: memberError,
+        } = await supabase
+            .from("users")
+            .select("id")
+            .eq("id", id)
+            .maybeSingle();
+
+        if (memberError) {
+            return res.status(500).json({
+                message: memberError.message,
+            });
+        }
+
+        if (!member) {
+            return res.status(404).json({
+                message: "Member not found",
+            });
+        }
+
+        /* Check existing progress */
+
+        const {
+            data: existingProgress,
+            error: progressFindError,
+        } = await supabase
+            .from("progress")
+            .select("*")
+            .eq("user_id", id)
+            .order("updated_at", {
+                ascending: false,
+            })
+            .limit(1)
+            .maybeSingle();
+
+        if (progressFindError) {
+            return res.status(500).json({
+                message: progressFindError.message,
+            });
+        }
+
+        const progressData = {
+            goal_percentage: goal,
+            weight: numericWeight,
+            notes: notes
+                ? notes.trim()
+                : null,
+            updated_at:
+                new Date().toISOString(),
+        };
+
+        let data;
+        let error;
+
+        /* Update existing progress */
+
+        if (existingProgress) {
+            const result = await supabase
+                .from("progress")
+                .update(progressData)
+                .eq("id", existingProgress.id)
+                .select("*")
+                .single();
+
+            data = result.data;
+            error = result.error;
+        }
+
+        /* Create new progress */
+
+        else {
+            const result = await supabase
+                .from("progress")
+                .insert([
+                    {
+                        user_id: id,
+                        ...progressData,
+                    },
+                ])
+                .select("*")
+                .single();
+
+            data = result.data;
+            error = result.error;
+        }
+
+        if (error) {
+            return res.status(500).json({
+                message: error.message,
+            });
+        }
+
+        res.status(200).json({
+            message:
+                "Progress updated successfully",
+            progress: data,
+        });
+    } catch (error) {
+        console.error(
+            "Update member progress error:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Server error",
+        });
+    }
+};
+
+/* =========================
+   EXPORTS
+========================= */
+
 module.exports = {
     getAllMembers,
     getMemberDetails,
     updateMember,
     deleteMember,
     getAdminStats,
+    updateMemberMembership,
+    updateMemberProgress,
 };

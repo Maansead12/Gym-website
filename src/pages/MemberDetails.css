@@ -8,52 +8,54 @@
     width: 86%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 100px 0 70px;
+    padding: 100px 0 80px;
 }
 
-/* BACK BUTTON */
+/* =========================
+   BACK BUTTON
+========================= */
 
 .back-admin-btn {
     background: transparent;
-    color: #aaa;
-    border: 1px solid #333;
-    padding: 11px 18px;
-    border-radius: 8px;
-    cursor: pointer;
+    color: #888;
+    border: none;
+    padding: 0;
     font-size: 14px;
-    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 40px;
     transition: 0.2s ease;
 }
 
 .back-admin-btn:hover {
     color: white;
-    border-color: #555;
 }
 
-/* PROFILE HEADER */
+/* =========================
+   PROFILE HEADER
+========================= */
 
 .member-profile-header {
     text-align: center;
-    margin-top: 45px;
+    margin-bottom: 55px;
 }
 
-.member-profile-header p {
+.member-profile-header>p {
     color: #888;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
     letter-spacing: 4px;
     margin: 0 0 15px;
 }
 
 .member-profile-header h1 {
-    font-size: 55px;
-    font-weight: 500;
-    margin: 0 0 20px;
+    font-size: 52px;
+    font-weight: 600;
+    margin: 0 0 18px;
 }
 
 .member-role-badge {
     display: inline-block;
-    padding: 7px 15px;
+    padding: 7px 16px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 700;
@@ -70,38 +72,38 @@
     color: #aaa;
 }
 
-/* GENERAL SECTIONS */
+/* =========================
+   SECTIONS
+========================= */
 
 .member-info-section {
-    margin-top: 55px;
     background: #151515;
     border: 1px solid #282828;
     border-radius: 15px;
     padding: 35px;
+    margin-bottom: 30px;
 }
 
 .member-info-section h2 {
-    font-size: 28px;
-    margin: 0 0 25px;
-}
-
-/* EDIT MEMBER */
-
-.edit-member-section {
-    border-color: #333;
+    font-size: 27px;
+    margin: 0 0 10px;
 }
 
 .edit-member-description {
     color: #777;
-    margin: -12px 0 28px;
+    margin: 0 0 28px;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.6;
 }
+
+/* =========================
+   EDIT FORM
+========================= */
 
 .edit-member-form {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
 }
 
 .edit-input-group {
@@ -111,13 +113,14 @@
 }
 
 .edit-input-group label {
-    color: #999;
+    color: #aaa;
     font-size: 13px;
     font-weight: 600;
 }
 
 .edit-input-group input,
-.edit-input-group select {
+.edit-input-group select,
+.edit-input-group textarea {
     width: 100%;
     box-sizing: border-box;
     background: #0b0b0b;
@@ -130,27 +133,55 @@
     transition: 0.2s ease;
 }
 
-.edit-input-group input::placeholder {
+.edit-input-group input:focus,
+.edit-input-group select:focus,
+.edit-input-group textarea:focus {
+    border-color: #666;
+}
+
+.edit-input-group input::placeholder,
+.edit-input-group textarea::placeholder {
     color: #555;
 }
 
-.edit-input-group input:focus,
-.edit-input-group select:focus {
-    border-color: #777;
+.edit-input-group textarea {
+    min-height: 150px;
+    resize: vertical;
+    line-height: 1.6;
+    font-family: inherit;
 }
 
-.edit-input-group select {
-    cursor: pointer;
+/* =========================
+   PROFESSIONAL NOTES
+========================= */
+
+.progress-notes-group {
+    grid-column: 1 / -1;
 }
+
+.progress-notes-group textarea {
+    min-height: 160px;
+}
+
+.input-help-text {
+    display: block;
+    color: #666;
+    font-size: 12px;
+    line-height: 1.5;
+    margin-top: 2px;
+}
+
+/* =========================
+   UPDATE BUTTON
+========================= */
 
 .update-member-btn {
-    grid-column: 1 / -1;
-    justify-self: flex-start;
+    align-self: end;
     background: #ff3b30;
     color: white;
     border: none;
     border-radius: 8px;
-    padding: 13px 22px;
+    padding: 13px 20px;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
@@ -168,197 +199,68 @@
     transform: none;
 }
 
+/* =========================
+   SUCCESS / ERROR MESSAGE
+========================= */
+
 .edit-member-message {
-    margin: 20px 0 0;
     color: #aaa;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    margin: 18px 0 0;
 }
 
-/* DELETE MEMBER */
-
-.delete-member-section {
-    border-color: #3a2020;
-    text-align: center;
-}
-
-.delete-member-section h2 {
-    text-align: center;
-}
-
-.delete-description {
-    color: #888;
-    font-size: 14px;
-    line-height: 1.6;
-    max-width: 700px;
-    margin: -10px auto 22px;
-    text-align: center;
-}
-
-.delete-member-btn {
-    background: #8f211b;
-    color: white;
-    border: 1px solid #b52b23;
-    border-radius: 8px;
-    padding: 12px 20px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.delete-member-btn:hover {
-    background: #ff3b30;
-}
-
-.delete-member-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.delete-member-message {
-    color: #ff6b61;
-    margin-top: 18px;
-    font-size: 14px;
-    font-weight: 600;
-}
-
-/* DELETE CONFIRMATION MODAL */
-
-.delete-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.78);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 9999;
-}
-
-.delete-modal {
-    width: 100%;
-    max-width: 450px;
-    background: #171717;
-    border: 1px solid #383838;
-    border-radius: 15px;
-    padding: 35px;
-    text-align: center;
-    box-sizing: border-box;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-}
-
-.delete-modal-icon {
-    font-size: 38px;
-    margin-bottom: 15px;
-}
-
-.delete-modal h2 {
-    margin: 0 0 15px;
-    font-size: 28px;
-}
-
-.delete-modal p {
-    color: #999;
-    font-size: 14px;
-    line-height: 1.6;
-    margin: 0 auto 12px;
-}
-
-.delete-modal p strong {
-    color: white;
-}
-
-.delete-warning {
-    color: #ff6b61 !important;
-}
-
-.delete-modal-actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 28px;
-}
-
-.cancel-delete-btn,
-.confirm-delete-btn {
-    flex: 1;
-    padding: 13px 18px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.2s ease;
-}
-
-.cancel-delete-btn {
-    background: #292929;
-    color: white;
-    border: 1px solid #444;
-}
-
-.cancel-delete-btn:hover {
-    background: #333;
-}
-
-.confirm-delete-btn {
-    background: #ff3b30;
-    color: white;
-    border: 1px solid #ff3b30;
-}
-
-.confirm-delete-btn:hover {
-    background: #d92f27;
-}
-
-.cancel-delete-btn:disabled,
-.confirm-delete-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* INFO GRID */
+/* =========================
+   ACCOUNT INFORMATION
+========================= */
 
 .member-info-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
+    gap: 15px;
 }
 
 .member-info-card {
     background: #0b0b0b;
     border: 1px solid #282828;
     border-radius: 10px;
-    padding: 22px;
+    padding: 20px;
 }
 
 .member-info-card span {
     display: block;
-    color: #777;
-    font-size: 13px;
-    margin-bottom: 9px;
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 8px;
 }
 
 .member-info-card strong {
     display: block;
     color: white;
-    font-size: 17px;
-    font-weight: 600;
-    word-break: break-word;
+    font-size: 15px;
+    line-height: 1.5;
 }
 
 .member-notes-card {
     grid-column: 1 / -1;
 }
 
-/* EMPTY */
+/* =========================
+   EMPTY
+========================= */
 
 .member-empty {
     text-align: center;
     padding: 35px;
-    color: #777;
+    color: #666;
 }
 
-/* WORKOUTS */
+.member-empty p {
+    margin: 0;
+}
+
+/* =========================
+   WORKOUTS
+========================= */
 
 .member-workouts {
     display: flex;
@@ -368,8 +270,8 @@
 .member-workout {
     display: flex;
     align-items: center;
-    gap: 18px;
-    padding: 20px 0;
+    gap: 15px;
+    padding: 18px 0;
     border-bottom: 1px solid #282828;
 }
 
@@ -378,25 +280,32 @@
 }
 
 .workout-icon {
-    width: 52px;
-    height: 52px;
-    background: #202020;
+    width: 45px;
+    height: 45px;
+    flex-shrink: 0;
     border-radius: 10px;
+    background: #222;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
-    flex-shrink: 0;
+    font-size: 20px;
+}
+
+.workout-details {
+    flex: 1;
 }
 
 .workout-details strong {
-    font-size: 17px;
+    display: block;
+    color: white;
+    font-size: 15px;
+    margin-bottom: 5px;
 }
 
 .workout-details p {
-    color: #888;
-    margin: 6px 0;
-    font-size: 14px;
+    color: #777;
+    font-size: 13px;
+    margin: 0 0 5px;
 }
 
 .workout-details span {
@@ -404,16 +313,135 @@
     font-size: 12px;
 }
 
-/* LOADING */
+/* =========================
+   DANGER ZONE
+========================= */
+
+.delete-member-section {
+    border-color: #43201e;
+}
+
+.delete-member-section h2 {
+    color: #ff5147;
+}
+
+.delete-description {
+    color: #777;
+    line-height: 1.6;
+    font-size: 14px;
+    margin: 0 0 20px;
+}
+
+.delete-member-btn {
+    background: transparent;
+    color: #ff5147;
+    border: 1px solid #6b2925;
+    border-radius: 8px;
+    padding: 11px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.delete-member-btn:hover {
+    background: #321513;
+    border-color: #ff5147;
+}
+
+.delete-member-message {
+    color: #ff5147;
+    font-size: 13px;
+    margin-top: 15px;
+}
+
+/* =========================
+   DELETE MODAL
+========================= */
+
+.delete-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.delete-modal {
+    width: 100%;
+    max-width: 450px;
+    background: #151515;
+    border: 1px solid #333;
+    border-radius: 15px;
+    padding: 35px;
+    text-align: center;
+}
+
+.delete-modal-icon {
+    font-size: 40px;
+    margin-bottom: 15px;
+}
+
+.delete-modal h2 {
+    margin: 0 0 15px;
+}
+
+.delete-modal p {
+    color: #888;
+    line-height: 1.6;
+}
+
+.delete-modal p strong {
+    color: white;
+}
+
+.delete-warning {
+    color: #ff5147 !important;
+    font-size: 13px;
+}
+
+.delete-modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.cancel-delete-btn,
+.confirm-delete-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cancel-delete-btn {
+    background: #292929;
+    color: white;
+    border: 1px solid #444;
+}
+
+.confirm-delete-btn {
+    background: #ff3b30;
+    color: white;
+    border: none;
+}
+
+/* =========================
+   LOADING
+========================= */
 
 .member-details-loading {
     min-height: 100vh;
     background: #0b0b0b;
     color: white;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
     gap: 20px;
 }
 
@@ -425,42 +453,24 @@
     background: #ff3b30;
     color: white;
     border: none;
-    padding: 12px 22px;
+    padding: 12px 20px;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 700;
 }
 
-/* TABLET */
-
-@media (max-width: 900px) {
-    .edit-member-form {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .update-member-btn {
-        grid-column: 1 / -1;
-    }
-}
-
-/* MOBILE */
+/* =========================
+   TABLET
+========================= */
 
 @media (max-width: 800px) {
     .member-details-content {
         width: 90%;
-        padding: 60px 0;
+        padding: 70px 0;
     }
 
     .member-profile-header h1 {
         font-size: 40px;
-    }
-
-    .member-info-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .member-notes-card {
-        grid-column: auto;
     }
 
     .member-info-section {
@@ -471,15 +481,33 @@
         grid-template-columns: 1fr;
     }
 
-    .update-member-btn {
+    .progress-notes-group {
         grid-column: auto;
+    }
+
+    .member-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .member-notes-card {
+        grid-column: auto;
+    }
+
+    .update-member-btn {
         width: 100%;
     }
 }
 
-/* SMALL MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 500px) {
+    .member-details-content {
+        width: 92%;
+        padding: 50px 0;
+    }
+
     .member-profile-header h1 {
         font-size: 32px;
     }
@@ -492,35 +520,15 @@
         font-size: 23px;
     }
 
-    .back-admin-btn {
-        font-size: 13px;
-        padding: 10px 14px;
-    }
-
-    .member-workout {
-        gap: 12px;
-    }
-
-    .workout-icon {
-        width: 45px;
-        height: 45px;
-        font-size: 20px;
+    .member-info-card {
+        padding: 16px;
     }
 
     .delete-modal {
-        padding: 28px 22px;
-    }
-
-    .delete-modal h2 {
-        font-size: 24px;
+        padding: 25px;
     }
 
     .delete-modal-actions {
         flex-direction: column;
-    }
-
-    .cancel-delete-btn,
-    .confirm-delete-btn {
-        width: 100%;
     }
 }

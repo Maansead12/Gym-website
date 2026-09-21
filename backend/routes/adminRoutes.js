@@ -9,9 +9,13 @@ const {
     updateMember,
     deleteMember,
     getAdminStats,
+    updateMemberMembership,
+    updateMemberProgress,
 } = require("../controllers/adminController");
 
 const router = express.Router();
+
+/* ADMIN STATS */
 
 router.get(
     "/stats",
@@ -20,12 +24,16 @@ router.get(
     getAdminStats
 );
 
+/* ALL MEMBERS */
+
 router.get(
     "/members",
     authenticateToken,
     requireAdmin,
     getAllMembers
 );
+
+/* MEMBER DETAILS */
 
 router.get(
     "/members/:id",
@@ -34,12 +42,34 @@ router.get(
     getMemberDetails
 );
 
+/* UPDATE MEMBER */
+
 router.put(
     "/members/:id",
     authenticateToken,
     requireAdmin,
     updateMember
 );
+
+/* UPDATE MEMBERSHIP */
+
+router.put(
+    "/members/:id/membership",
+    authenticateToken,
+    requireAdmin,
+    updateMemberMembership
+);
+
+/* UPDATE PROGRESS */
+
+router.put(
+    "/members/:id/progress",
+    authenticateToken,
+    requireAdmin,
+    updateMemberProgress
+);
+
+/* DELETE MEMBER */
 
 router.delete(
     "/members/:id",

@@ -1,14 +1,20 @@
+/* =========================
+   ADMIN PAGE
+========================= */
+
 .admin-page {
     min-height: 100vh;
-    background: #0b0b0b;
-    color: white;
+    background:
+        radial-gradient(circle at 50% -20%, rgba(255, 59, 48, 0.10), transparent 35%),
+        #0a0a0a;
+    color: #fff;
 }
 
 .admin-content {
-    width: 86%;
-    max-width: 1200px;
+    width: 88%;
+    max-width: 1280px;
     margin: 0 auto;
-    padding: 100px 0 70px;
+    padding: 110px 0 80px;
 }
 
 /* =========================
@@ -17,21 +23,23 @@
 
 .admin-header {
     text-align: center;
+    margin-bottom: 10px;
 }
 
 .admin-header p:first-child {
-    color: #888;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 4px;
+    color: #ff3b30;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 5px;
     margin: 0 0 18px;
 }
 
 .admin-header h1 {
-    font-size: 60px;
-    font-weight: 500;
+    font-size: clamp(42px, 6vw, 68px);
+    font-weight: 600;
+    letter-spacing: -2px;
     margin: 0;
-    line-height: 1.1;
+    line-height: 1;
 }
 
 .admin-header h1 span {
@@ -39,10 +47,11 @@
 }
 
 .admin-header p:last-child {
-    color: #999;
-    font-size: 18px;
-    margin: 18px 0 0;
-    line-height: 1.5;
+    max-width: 650px;
+    margin: 22px auto 0;
+    color: #777;
+    font-size: 16px;
+    line-height: 1.7;
 }
 
 /* =========================
@@ -52,45 +61,72 @@
 .admin-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-top: 65px;
+    gap: 18px;
+    margin-top: 60px;
 }
 
 .admin-stat-card {
     position: relative;
-    background: #151515;
-    border: 1px solid #282828;
-    border-radius: 15px;
-    padding: 30px;
     min-height: 175px;
-    transition: 0.2s ease;
+    padding: 27px;
+    background: linear-gradient(145deg, #171717, #111);
+    border: 1px solid #292929;
+    border-radius: 18px;
     overflow: hidden;
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+.admin-stat-card::after {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    right: -45px;
+    bottom: -45px;
+    background: rgba(255, 59, 48, 0.08);
+    border-radius: 50%;
+    filter: blur(5px);
 }
 
 .admin-stat-card:hover {
-    transform: translateY(-4px);
-    border-color: #444;
+    transform: translateY(-5px);
+    border-color: #3b3b3b;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
 }
 
 .admin-stat-icon {
-    display: block;
-    font-size: 25px;
-    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-bottom: 22px;
+    background: #202020;
+    border: 1px solid #303030;
+    border-radius: 12px;
+    font-size: 20px;
 }
 
 .admin-stat-card h3 {
-    color: #999;
-    font-size: 14px;
-    font-weight: 600;
-    margin: 0 0 10px;
+    color: #888;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin: 0 0 9px;
 }
 
 .admin-stat-card strong {
     display: block;
-    font-size: 38px;
+    color: #fff;
+    font-size: 40px;
     font-weight: 800;
     line-height: 1;
-    margin-bottom: 10px;
+    letter-spacing: -1px;
+    margin-bottom: 11px;
 }
 
 .admin-stat-card p {
@@ -100,46 +136,62 @@
 }
 
 /* =========================
+   SHARED SECTION STYLE
+========================= */
+
+.recent-members-section,
+.members-section {
+    margin-top: 42px;
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid #292929;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+}
+
+/* =========================
    RECENT MEMBERS
 ========================= */
 
 .recent-members-section {
-    margin-top: 50px;
-    background: #151515;
-    border: 1px solid #282828;
-    border-radius: 15px;
-    padding: 35px;
+    padding: 34px;
 }
 
 .recent-members-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 25px;
+    gap: 20px;
+    margin-bottom: 22px;
 }
 
 .recent-members-header p {
-    color: #888;
-    font-size: 11px;
-    font-weight: 700;
+    color: #ff3b30;
+    font-size: 10px;
+    font-weight: 800;
     letter-spacing: 3px;
     margin: 0 0 8px;
 }
 
 .recent-members-header h2 {
-    font-size: 28px;
+    color: #fff;
+    font-size: 27px;
+    font-weight: 600;
     margin: 0;
 }
 
 .recent-members-header>span {
-    color: #777;
-    background: #202020;
+    color: #999;
+    background: #1c1c1c;
     border: 1px solid #303030;
-    border-radius: 20px;
-    padding: 7px 13px;
-    font-size: 12px;
-    font-weight: 600;
+    border-radius: 30px;
+    padding: 8px 14px;
+    font-size: 11px;
+    font-weight: 700;
 }
+
+/* =========================
+   RECENT MEMBER LIST
+========================= */
 
 .recent-members-list {
     display: flex;
@@ -150,26 +202,31 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 17px 0;
-    border-bottom: 1px solid #282828;
+    padding: 17px 4px;
+    border-bottom: 1px solid #262626;
+    transition: background 0.2s ease;
 }
 
 .recent-member-item:last-child {
     border-bottom: none;
 }
 
+.recent-member-item:hover {
+    background: rgba(255, 255, 255, 0.015);
+}
+
 .recent-member-avatar {
-    width: 45px;
-    height: 45px;
+    width: 46px;
+    height: 46px;
     flex-shrink: 0;
-    background: #292929;
-    border: 1px solid #3a3a3a;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    font-size: 16px;
+    background: linear-gradient(145deg, #303030, #1d1d1d);
+    border: 1px solid #3a3a3a;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 15px;
     font-weight: 800;
 }
 
@@ -180,15 +237,16 @@
 
 .recent-member-info strong {
     display: block;
-    color: white;
-    font-size: 15px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
     margin-bottom: 5px;
 }
 
 .recent-member-info span {
     display: block;
     color: #666;
-    font-size: 13px;
+    font-size: 12px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -196,7 +254,7 @@
 
 .recent-member-date {
     color: #666;
-    font-size: 12px;
+    font-size: 11px;
     white-space: nowrap;
 }
 
@@ -205,21 +263,21 @@
 ========================= */
 
 .members-section {
-    margin-top: 50px;
-    background: #151515;
-    border: 1px solid #282828;
-    border-radius: 15px;
-    padding: 35px;
+    padding: 34px;
 }
 
 .members-header h2 {
-    font-size: 28px;
+    color: #fff;
+    font-size: 27px;
+    font-weight: 600;
     margin: 0 0 8px;
 }
 
 .members-header p {
-    color: #777;
-    margin: 0 0 30px;
+    color: #666;
+    font-size: 13px;
+    line-height: 1.6;
+    margin: 0 0 28px;
 }
 
 /* =========================
@@ -229,43 +287,45 @@
 .members-controls {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
+    gap: 12px;
+    margin-bottom: 14px;
 }
 
 .member-search {
     flex: 1;
+    min-height: 46px;
     display: flex;
     align-items: center;
-    gap: 10px;
-    background: #0b0b0b;
-    border: 1px solid #333;
-    border-radius: 9px;
+    gap: 11px;
+    background: #0c0c0c;
+    border: 1px solid #2d2d2d;
+    border-radius: 10px;
     padding: 0 14px;
     transition: 0.2s ease;
 }
 
 .member-search:focus-within {
-    border-color: #666;
+    border-color: #555;
+    box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.06);
 }
 
 .member-search span {
-    font-size: 15px;
-    opacity: 0.7;
+    color: #777;
+    font-size: 14px;
 }
 
 .member-search input {
     width: 100%;
     background: transparent;
-    color: white;
+    color: #fff;
     border: none;
     outline: none;
     padding: 13px 0;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .member-search input::placeholder {
-    color: #555;
+    color: #4f4f4f;
 }
 
 .member-filter {
@@ -275,30 +335,31 @@
 }
 
 .member-filter label {
-    color: #777;
-    font-size: 13px;
-    font-weight: 600;
+    color: #666;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 .member-filter select {
-    background: #0b0b0b;
-    color: white;
-    border: 1px solid #333;
-    border-radius: 9px;
-    padding: 12px 35px 12px 13px;
-    font-size: 14px;
+    min-height: 46px;
+    background: #0c0c0c;
+    color: #fff;
+    border: 1px solid #2d2d2d;
+    border-radius: 10px;
+    padding: 0 34px 0 13px;
+    font-size: 13px;
     outline: none;
     cursor: pointer;
 }
 
 .member-filter select:focus {
-    border-color: #666;
+    border-color: #555;
 }
 
 .member-results-count {
-    color: #666;
-    font-size: 13px;
-    margin: 0 0 20px;
+    color: #555;
+    font-size: 11px;
+    margin: 0 0 18px;
 }
 
 .member-results-count strong {
@@ -312,39 +373,50 @@
 .members-table-wrapper {
     width: 100%;
     overflow-x: auto;
+    border: 1px solid #282828;
+    border-radius: 12px;
 }
 
 .members-table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 700px;
+    min-width: 720px;
 }
 
 .members-table th {
     text-align: left;
-    color: #888;
-    font-size: 14px;
-    font-weight: 600;
-    padding: 16px;
-    border-bottom: 1px solid #333;
+    color: #666;
+    background: #111;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 15px 16px;
+    border-bottom: 1px solid #2b2b2b;
 }
 
 .members-table td {
-    padding: 18px 16px;
-    border-bottom: 1px solid #282828;
-    color: #aaa;
+    padding: 17px 16px;
+    border-bottom: 1px solid #222;
+    color: #888;
+    font-size: 13px;
 }
 
 .members-table tbody tr {
-    transition: 0.2s ease;
+    transition: background 0.2s ease;
 }
 
 .members-table tbody tr:hover {
-    background: #1b1b1b;
+    background: #181818;
+}
+
+.members-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .members-table td strong {
-    color: white;
+    color: #eee;
+    font-weight: 600;
 }
 
 /* =========================
@@ -352,22 +424,26 @@
 ========================= */
 
 .role-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 11px;
+    border-radius: 30px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
 }
 
 .admin-role {
-    background: #ff3b30;
-    color: white;
+    background: rgba(255, 59, 48, 0.12);
+    color: #ff6b62;
+    border: 1px solid rgba(255, 59, 48, 0.25);
 }
 
 .member-role {
-    background: #292929;
-    color: #aaa;
+    background: #242424;
+    color: #999;
+    border: 1px solid #333;
 }
 
 /* =========================
@@ -376,19 +452,27 @@
 
 .view-member-btn {
     background: #ff3b30;
-    color: white;
+    color: #fff;
     border: none;
-    border-radius: 7px;
-    padding: 9px 16px;
-    font-size: 13px;
-    font-weight: 700;
+    border-radius: 8px;
+    padding: 9px 15px;
+    font-size: 11px;
+    font-weight: 800;
     cursor: pointer;
-    transition: 0.2s ease;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .view-member-btn:hover {
     background: #ff5147;
     transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255, 59, 48, 0.18);
+}
+
+.view-member-btn:active {
+    transform: translateY(0);
 }
 
 /* =========================
@@ -397,19 +481,20 @@
 
 .clear-search-btn {
     margin-top: 15px;
-    background: #292929;
-    color: white;
-    border: 1px solid #444;
-    border-radius: 7px;
+    background: #222;
+    color: #ddd;
+    border: 1px solid #363636;
+    border-radius: 8px;
     padding: 10px 18px;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
     cursor: pointer;
     transition: 0.2s ease;
 }
 
 .clear-search-btn:hover {
-    background: #333;
+    background: #2d2d2d;
+    border-color: #444;
 }
 
 /* =========================
@@ -418,8 +503,13 @@
 
 .members-empty {
     text-align: center;
-    padding: 40px;
-    color: #777;
+    padding: 45px 20px;
+    color: #666;
+}
+
+.members-empty p {
+    margin: 0;
+    font-size: 13px;
 }
 
 /* =========================
@@ -428,8 +518,8 @@
 
 .admin-loading {
     min-height: 100vh;
-    background: #0b0b0b;
-    color: white;
+    background: #0a0a0a;
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -438,17 +528,41 @@
 }
 
 .admin-loading h2 {
+    color: #aaa;
+    font-size: 18px;
     font-weight: 500;
 }
 
 .admin-loading button {
     background: #ff3b30;
-    color: white;
+    color: #fff;
     border: none;
     padding: 12px 22px;
     border-radius: 8px;
     cursor: pointer;
+    font-size: 13px;
     font-weight: 700;
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+.members-table-wrapper::-webkit-scrollbar {
+    height: 7px;
+}
+
+.members-table-wrapper::-webkit-scrollbar-track {
+    background: #111;
+}
+
+.members-table-wrapper::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 10px;
+}
+
+.members-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #444;
 }
 
 /* =========================
@@ -459,6 +573,10 @@
     .admin-stats {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .admin-content {
+        width: 90%;
+    }
 }
 
 /* =========================
@@ -468,15 +586,15 @@
 @media (max-width: 800px) {
     .admin-content {
         width: 90%;
-        padding: 60px 0;
+        padding: 75px 0 55px;
     }
 
     .admin-header h1 {
-        font-size: 40px;
+        font-size: 42px;
     }
 
     .admin-header p:last-child {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .admin-stats {
@@ -485,12 +603,12 @@
     }
 
     .admin-stat-card {
-        min-height: auto;
+        min-height: 145px;
     }
 
     .recent-members-section,
     .members-section {
-        padding: 25px;
+        padding: 24px;
     }
 
     .recent-members-header {
@@ -508,6 +626,7 @@
 
     .member-filter {
         width: 100%;
+        justify-content: space-between;
     }
 
     .member-filter select {
@@ -520,26 +639,37 @@
 ========================= */
 
 @media (max-width: 500px) {
+    .admin-content {
+        width: 92%;
+    }
+
     .admin-header h1 {
-        font-size: 32px;
+        font-size: 34px;
+        letter-spacing: -1px;
+    }
+
+    .admin-header p:first-child {
+        font-size: 10px;
+        letter-spacing: 3px;
     }
 
     .admin-header p:last-child {
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .recent-members-section,
     .members-section {
-        padding: 20px;
+        padding: 19px;
+        border-radius: 14px;
     }
 
     .recent-members-header h2,
     .members-header h2 {
-        font-size: 23px;
+        font-size: 22px;
     }
 
     .recent-members-header>span {
-        font-size: 10px;
+        font-size: 9px;
         padding: 6px 10px;
     }
 
@@ -550,27 +680,27 @@
     .recent-member-avatar {
         width: 40px;
         height: 40px;
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .recent-member-info strong {
-        font-size: 14px;
+        font-size: 13px;
     }
 
     .recent-member-info span {
-        font-size: 11px;
+        font-size: 10px;
     }
 
     .view-member-btn {
         padding: 8px 11px;
-        font-size: 11px;
+        font-size: 10px;
     }
 
     .members-table {
-        min-width: 650px;
+        min-width: 680px;
     }
 
     .member-filter label {
-        font-size: 12px;
+        font-size: 11px;
     }
 }
