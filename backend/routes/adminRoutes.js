@@ -8,9 +8,17 @@ const {
     getMemberDetails,
     updateMember,
     deleteMember,
+    getAdminStats,
 } = require("../controllers/adminController");
 
 const router = express.Router();
+
+router.get(
+    "/stats",
+    authenticateToken,
+    requireAdmin,
+    getAdminStats
+);
 
 router.get(
     "/members",

@@ -257,7 +257,6 @@ const deleteMember = async (req, res) => {
             });
         }
 
-        // Prevent admin from deleting their own account
         if (req.user.id === id) {
             return res.status(400).json({
                 message:
@@ -314,9 +313,126 @@ const deleteMember = async (req, res) => {
     }
 };
 
+/* ADMIN STATISTICS */
+
+const getAdminStats = async (req, res) => {
+    try {
+        // Total users
+        const {
+            count: totalUsers,
+            error: usersError,
+        } = await supabase
+            .from("users")
+            .select("*", {
+                count: "exact",
+                head: true,
+            });
+
+        if (usersError) {
+            return res.status(500).json({
+                message: usersError.message,
+            });
+        }
+
+        // Active memberships
+        const {
+            count: activeMemberships,
+            error: membershipsError,
+        } = await supabase
+            .from("memberships")
+            .select("*", {
+                count: "exact",
+                head: true,
+            })
+            .eq("status", "active");
+
+        if (membershipsError) {
+            return res.status(500).json({
+                message: membershipsError.message,
+            });
+        }
+
+        // Total workouts
+        const {
+            count: totalWorkouts,
+            error: workoutsError,
+        } = await supabase
+            .from("workouts")
+            .select("*", {
+                count: "exact",
+                head: true,
+            });
+
+        if (workoutsError) {
+            return res.status(500).json({
+                message: workoutsError.message,
+            });
+        }
+
+        // Members with progress
+        const {
+            count: membersWithProgress,
+            error: progressError,
+        } = await supabase
+            .from("progress")
+            .select("*", {
+                count: "exact",
+                head: true,
+            });
+
+        if (progressError) {
+            return res.status(500).json({
+                message: progressError.message,
+            });
+        }
+
+        // Recently joined users
+        const {
+            data: recentMembers,
+            error: recentMembersError,
+        } = await supabase
+            .from("users")
+            .select(
+                "id, name, email, role, created_at"
+            )
+            .order("created_at", {
+                ascending: false,
+            })
+            .limit(5);
+
+        if (recentMembersError) {
+            return res.status(500).json({
+                message: recentMembersError.message,
+            });
+        }
+
+        res.status(200).json({
+            stats: {
+                totalUsers: totalUsers || 0,
+                activeMemberships:
+                    activeMemberships || 0,
+                totalWorkouts: totalWorkouts || 0,
+                membersWithProgress:
+                    membersWithProgress || 0,
+            },
+            recentMembers: recentMembers || [],
+        });
+    } catch (error) {
+        console.error(
+            "Admin stats error:",
+            error
+        );
+
+        res.status(500).json({
+            message: "Server error",
+        });
+    }
+};
+
 module.exports = {
     getAllMembers,
     getMemberDetails,
     updateMember,
     deleteMember,
+    getAdminStats,
 };
