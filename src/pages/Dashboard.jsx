@@ -27,6 +27,15 @@ function Dashboard() {
     const [progressMessage, setProgressMessage] = useState("");
     const [updatingProgress, setUpdatingProgress] = useState(false);
 
+    // Membership states
+    const [membershipPlan, setMembershipPlan] = useState("Basic");
+    const [membershipStartDate, setMembershipStartDate] = useState(
+        new Date().toISOString().split("T")[0]
+    );
+    const [membershipEndDate, setMembershipEndDate] = useState("");
+    const [membershipMessage, setMembershipMessage] = useState("");
+    const [updatingMembership, setUpdatingMembership] = useState(false);
+
     useEffect(() => {
         const token = localStorage.getItem("fitzone_token");
         const savedUser = localStorage.getItem("fitzone_user");
@@ -77,7 +86,7 @@ function Dashboard() {
 
             setDashboard(data);
 
-            // Load existing progress into the form
+            // Load existing progress
             if (data.progress) {
                 setWeight(
                     data.progress.weight !== null &&
@@ -91,6 +100,22 @@ function Dashboard() {
                 );
 
                 setNotes(data.progress.notes || "");
+            }
+
+            // Load existing membership
+            if (data.membership) {
+                setMembershipPlan(
+                    data.membership.plan || "Basic"
+                );
+
+                setMembershipStartDate(
+                    data.membership.start_date ||
+                    new Date().toISOString().split("T")[0]
+                );
+
+                setMembershipEndDate(
+                    data.membership.end_date || ""
+                );
             }
         } catch (error) {
             console.error("Dashboard error:", error);
@@ -235,6 +260,89 @@ function Dashboard() {
         }
     }
 
+    async function handleUpdateMembership(event) {
+        event.preventDefault();
+
+        setMembershipMessage("");
+
+        if (!membershipPlan) {
+            setMembershipMessage(
+                "Please select a membership plan."
+            );
+
+            return;
+        }
+
+        if (!membershipStartDate) {
+            setMembershipMessage(
+                "Please select a start date."
+            );
+
+            return;
+        }
+
+        if (
+            membershipEndDate &&
+            membershipEndDate < membershipStartDate
+        ) {
+            setMembershipMessage(
+                "End date cannot be before start date."
+            );
+
+            return;
+        }
+
+        try {
+            setUpdatingMembership(true);
+
+            const token = localStorage.getItem("fitzone_token");
+
+            const response = await fetch(
+                "http://localhost:5000/api/memberships",
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        plan: membershipPlan,
+                        start_date: membershipStartDate,
+                        end_date: membershipEndDate || null,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setMembershipMessage(
+                    data.message ||
+                    "Failed to update membership."
+                );
+
+                return;
+            }
+
+            setMembershipMessage(
+                "Membership updated successfully! 💪"
+            );
+
+            await loadDashboard(token);
+        } catch (error) {
+            console.error(
+                "Membership update error:",
+                error
+            );
+
+            setMembershipMessage(
+                "Unable to connect to the server."
+            );
+        } finally {
+            setUpdatingMembership(false);
+        }
+    }
+
     if (!user || loading) {
         return (
             <div className="dashboard-loading">
@@ -322,6 +430,95 @@ function Dashboard() {
 
                         <p>Monthly Goal</p>
                     </div>
+
+                </section>
+
+                {/* MEMBERSHIP */}
+
+                <section className="membership-section">
+
+                    <h2>My Membership</h2>
+
+                    <p>
+                        Choose your membership plan and manage
+                        your membership dates.
+                    </p>
+
+                    <form
+                        className="membership-form"
+                        onSubmit={handleUpdateMembership}
+                    >
+
+                        <div className="membership-input-group">
+                            <label>Membership Plan</label>
+
+                            <select
+                                value={membershipPlan}
+                                onChange={(event) =>
+                                    setMembershipPlan(
+                                        event.target.value
+                                    )
+                                }
+                            >
+                                <option value="Basic">
+                                    Basic
+                                </option>
+
+                                <option value="Premium">
+                                    Premium
+                                </option>
+
+                                <option value="Pro">
+                                    Pro
+                                </option>
+                            </select>
+                        </div>
+
+                        <div className="membership-input-group">
+                            <label>Start Date</label>
+
+                            <input
+                                type="date"
+                                value={membershipStartDate}
+                                onChange={(event) =>
+                                    setMembershipStartDate(
+                                        event.target.value
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="membership-input-group">
+                            <label>End Date</label>
+
+                            <input
+                                type="date"
+                                value={membershipEndDate}
+                                onChange={(event) =>
+                                    setMembershipEndDate(
+                                        event.target.value
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <button
+                            className="membership-btn"
+                            type="submit"
+                            disabled={updatingMembership}
+                        >
+                            {updatingMembership
+                                ? "Updating..."
+                                : "Update Membership →"}
+                        </button>
+
+                    </form>
+
+                    {membershipMessage && (
+                        <p className="membership-message">
+                            {membershipMessage}
+                        </p>
+                    )}
 
                 </section>
 
