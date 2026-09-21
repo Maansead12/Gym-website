@@ -10,6 +10,15 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    const [workoutName, setWorkoutName] = useState("");
+    const [workoutType, setWorkoutType] = useState("Strength");
+    const [duration, setDuration] = useState("");
+    const [workoutDate, setWorkoutDate] = useState(
+        new Date().toISOString().split("T")[0]
+    );
+    const [workoutMessage, setWorkoutMessage] = useState("");
+    const [addingWorkout, setAddingWorkout] = useState(false);
+
     useEffect(() => {
         const token = localStorage.getItem("fitzone_token");
         const savedUser = localStorage.getItem("fitzone_user");
@@ -22,47 +31,114 @@ function Dashboard() {
         const currentUser = JSON.parse(savedUser);
         setUser(currentUser);
 
-        async function loadDashboard() {
-            try {
-                const response = await fetch(
-                    "http://localhost:5000/api/dashboard",
-                    {
-                        method: "GET",
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
+        loadDashboard(token);
+    }, [navigate]);
 
-                const data = await response.json();
+    async function loadDashboard(token) {
+        try {
+            setLoading(true);
+            setError("");
 
-                if (!response.ok) {
-                    if (response.status === 401) {
-                        localStorage.removeItem("fitzone_token");
-                        localStorage.removeItem("fitzone_user");
-                        navigate("/login");
-                        return;
-                    }
+            const response = await fetch(
+                "http://localhost:5000/api/dashboard",
+                {
+                    method: "GET",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
 
-                    throw new Error(
-                        data.message || "Failed to load dashboard"
-                    );
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    localStorage.removeItem("fitzone_token");
+                    localStorage.removeItem("fitzone_user");
+                    navigate("/login");
+                    return;
                 }
 
-                setDashboard(data);
-            } catch (error) {
-                console.error("Dashboard error:", error);
-                setError(
-                    "Unable to load your dashboard data."
+                throw new Error(
+                    data.message || "Failed to load dashboard"
                 );
-            } finally {
-                setLoading(false);
             }
+
+            setDashboard(data);
+        } catch (error) {
+            console.error("Dashboard error:", error);
+            setError("Unable to load your dashboard data.");
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleAddWorkout(event) {
+        event.preventDefault();
+
+        setWorkoutMessage("");
+
+        if (!workoutName.trim()) {
+            setWorkoutMessage("Please enter a workout name.");
+            return;
         }
 
-        loadDashboard();
-    }, [navigate]);
+        try {
+            setAddingWorkout(true);
+
+            const token = localStorage.getItem("fitzone_token");
+
+            const response = await fetch(
+                "http://localhost:5000/api/workouts",
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        workout_name: workoutName.trim(),
+                        workout_type: workoutType,
+                        duration: duration
+                            ? Number(duration)
+                            : null,
+                        workout_date: workoutDate,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setWorkoutMessage(
+                    data.message || "Failed to add workout."
+                );
+                return;
+            }
+
+            setWorkoutMessage(
+                "Workout added successfully! 💪"
+            );
+
+            setWorkoutName("");
+            setWorkoutType("Strength");
+            setDuration("");
+            setWorkoutDate(
+                new Date().toISOString().split("T")[0]
+            );
+
+            await loadDashboard(token);
+        } catch (error) {
+            console.error("Add workout error:", error);
+
+            setWorkoutMessage(
+                "Unable to connect to the server."
+            );
+        } finally {
+            setAddingWorkout(false);
+        }
+    }
 
     if (!user || loading) {
         return (
@@ -76,7 +152,10 @@ function Dashboard() {
         return (
             <div className="dashboard-loading">
                 <h2>{error}</h2>
-                <button onClick={() => window.location.reload()}>
+
+                <button
+                    onClick={() => window.location.reload()}
+                >
                     Try Again
                 </button>
             </div>
@@ -86,7 +165,8 @@ function Dashboard() {
     const membership = dashboard?.membership;
     const workoutCount = dashboard?.workoutCount || 0;
     const progress = dashboard?.progress;
-    const recentWorkouts = dashboard?.recentWorkouts || [];
+    const recentWorkouts =
+        dashboard?.recentWorkouts || [];
 
     return (
         <div className="dashboard-page">
@@ -101,7 +181,8 @@ function Dashboard() {
                     </h1>
 
                     <p>
-                        Ready to get stronger and reach your fitness goals?
+                        Ready to get stronger and reach your
+                        fitness goals?
                     </p>
                 </section>
 
@@ -117,7 +198,8 @@ function Dashboard() {
                         </strong>
 
                         <p>
-                            {membership?.plan || "No membership yet"}
+                            {membership?.plan ||
+                                "No membership yet"}
                         </p>
                     </div>
 
@@ -141,6 +223,130 @@ function Dashboard() {
 
                 </section>
 
+                <section className="add-workout-section">
+
+                    <h2>Add Workout</h2>
+
+                    <p>
+                        Record your workout and keep track of
+                        your fitness activity.
+                    </p>
+
+                    <form
+                        className="workout-form"
+                        onSubmit={handleAddWorkout}
+                    >
+
+                        <div className="workout-input-group">
+                            <label>Workout Name</label>
+
+                            <input
+                                type="text"
+                                placeholder="e.g. Chest Workout"
+                                value={workoutName}
+                                onChange={(event) =>
+                                    setWorkoutName(
+                                        event.target.value
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="workout-input-group">
+                            <label>Workout Type</label>
+
+                            <select
+                                value={workoutType}
+                                onChange={(event) =>
+                                    setWorkoutType(
+                                        event.target.value
+                                    )
+                                }
+                            >
+                                <option value="Strength">
+                                    Strength
+                                </option>
+
+                                <option value="Cardio">
+                                    Cardio
+                                </option>
+
+                                <option value="Chest">
+                                    Chest
+                                </option>
+
+                                <option value="Back">
+                                    Back
+                                </option>
+
+                                <option value="Legs">
+                                    Legs
+                                </option>
+
+                                <option value="Shoulders">
+                                    Shoulders
+                                </option>
+
+                                <option value="Arms">
+                                    Arms
+                                </option>
+
+                                <option value="Full Body">
+                                    Full Body
+                                </option>
+                            </select>
+                        </div>
+
+                        <div className="workout-input-group">
+                            <label>Duration (minutes)</label>
+
+                            <input
+                                type="number"
+                                min="1"
+                                placeholder="60"
+                                value={duration}
+                                onChange={(event) =>
+                                    setDuration(
+                                        event.target.value
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="workout-input-group">
+                            <label>Workout Date</label>
+
+                            <input
+                                type="date"
+                                value={workoutDate}
+                                onChange={(event) =>
+                                    setWorkoutDate(
+                                        event.target.value
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <button
+                            className="add-workout-btn"
+                            type="submit"
+                            disabled={addingWorkout}
+                        >
+                            {addingWorkout
+                                ? "Adding Workout..."
+                                : "Add Workout →"}
+                        </button>
+
+                    </form>
+
+                    {workoutMessage && (
+                        <p className="workout-message">
+                            {workoutMessage}
+                        </p>
+                    )}
+
+                </section>
+
                 <section className="dashboard-activity">
 
                     <h2>Recent Activity</h2>
@@ -148,8 +354,9 @@ function Dashboard() {
                     {recentWorkouts.length === 0 ? (
                         <div className="activity-empty">
                             <p>No workouts recorded yet.</p>
+
                             <span>
-                                Your workouts will appear here.
+                                Add your first workout above.
                             </span>
                         </div>
                     ) : (
