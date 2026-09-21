@@ -5,7 +5,21 @@ function Navbar() {
   const navigate = useNavigate();
 
   const token = localStorage.getItem("fitzone_token");
+  const savedUser = localStorage.getItem("fitzone_user");
+
   const isLoggedIn = !!token;
+
+  let user = null;
+
+  if (savedUser) {
+    try {
+      user = JSON.parse(savedUser);
+    } catch (error) {
+      console.error("User data error:", error);
+    }
+  }
+
+  const isAdmin = user?.role === "admin";
 
   function handleLogout() {
     localStorage.removeItem("fitzone_token");
@@ -19,6 +33,7 @@ function Navbar() {
       <div className="logo">FITZONE</div>
 
       <ul className="nav-links">
+
         <li>
           <Link to="/">Home</Link>
         </li>
@@ -33,9 +48,20 @@ function Navbar() {
 
         {isLoggedIn && (
           <li>
-            <Link to="/dashboard">Dashboard</Link>
+            <Link to="/dashboard">
+              Dashboard
+            </Link>
           </li>
         )}
+
+        {isAdmin && (
+          <li>
+            <Link to="/admin">
+              Admin
+            </Link>
+          </li>
+        )}
+
       </ul>
 
       {isLoggedIn ? (

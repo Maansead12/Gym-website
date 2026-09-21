@@ -9,6 +9,7 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const workoutRoutes = require("./routes/workoutRoutes");
 const progressRoutes = require("./routes/progressRoutes");
 const membershipRoutes = require("./routes/membershipRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
@@ -39,6 +40,8 @@ app.use("/api/workouts", workoutRoutes);
 app.use("/api/progress", progressRoutes);
 
 app.use("/api/memberships", membershipRoutes);
+
+app.use("/api/admin", adminRoutes);
 
 app.use((req, res) => {
     res.status(404).json({

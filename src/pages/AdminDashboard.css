@@ -1,0 +1,249 @@
+.admin-page {
+    min-height: 100vh;
+    background: #0b0b0b;
+    color: white;
+}
+
+.admin-content {
+    width: 86%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 100px 0 70px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.admin-header {
+    text-align: center;
+}
+
+.admin-header p:first-child {
+    color: #888;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    margin: 0 0 18px;
+}
+
+.admin-header h1 {
+    font-size: 60px;
+    font-weight: 500;
+    margin: 0;
+}
+
+.admin-header h1 span {
+    color: #ff3b30;
+}
+
+.admin-header p:last-child {
+    color: #999;
+    font-size: 18px;
+    margin: 18px 0 0;
+    line-height: 1.5;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-top: 65px;
+}
+
+.admin-stat-card {
+    background: #151515;
+    border: 1px solid #282828;
+    border-radius: 15px;
+    padding: 35px;
+    text-align: center;
+    transition: 0.2s ease;
+}
+
+.admin-stat-card:hover {
+    transform: translateY(-4px);
+    border-color: #444;
+}
+
+.admin-stat-card h3 {
+    color: #999;
+    font-size: 19px;
+    margin: 0 0 20px;
+}
+
+.admin-stat-card strong {
+    font-size: 40px;
+    font-weight: 800;
+}
+
+/* =========================
+   MEMBERS
+========================= */
+
+.members-section {
+    margin-top: 60px;
+    background: #151515;
+    border: 1px solid #282828;
+    border-radius: 15px;
+    padding: 35px;
+}
+
+.members-header h2 {
+    font-size: 28px;
+    margin: 0 0 8px;
+}
+
+.members-header p {
+    color: #777;
+    margin: 0 0 30px;
+}
+
+.members-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.members-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.members-table th {
+    text-align: left;
+    color: #888;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 16px;
+    border-bottom: 1px solid #333;
+}
+
+.members-table td {
+    padding: 18px 16px;
+    border-bottom: 1px solid #282828;
+    color: #aaa;
+}
+
+.members-table tbody tr {
+    transition: 0.2s ease;
+}
+
+.members-table tbody tr:hover {
+    background: #1b1b1b;
+}
+
+.members-table td strong {
+    color: white;
+}
+
+/* =========================
+   ROLE BADGES
+========================= */
+
+.role-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.admin-role {
+    background: #ff3b30;
+    color: white;
+}
+
+.member-role {
+    background: #292929;
+    color: #aaa;
+}
+
+/* =========================
+   VIEW MEMBER BUTTON
+========================= */
+
+.view-member-btn {
+    background: #ff3b30;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.view-member-btn:hover {
+    background: #ff5147;
+    transform: translateY(-1px);
+}
+
+/* =========================
+   EMPTY
+========================= */
+
+.members-empty {
+    text-align: center;
+    padding: 40px;
+    color: #777;
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.admin-loading {
+    min-height: 100vh;
+    background: #0b0b0b;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-loading h2 {
+    font-weight: 500;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 800px) {
+    .admin-content {
+        width: 90%;
+        padding: 60px 0;
+    }
+
+    .admin-header h1 {
+        font-size: 40px;
+    }
+
+    .admin-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .members-section {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 500px) {
+    .admin-header h1 {
+        font-size: 32px;
+    }
+
+    .members-section {
+        padding: 20px;
+    }
+
+    .members-table {
+        min-width: 650px;
+    }
+}
