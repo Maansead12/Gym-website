@@ -11,7 +11,9 @@
     padding: 100px 0 70px;
 }
 
-/* WELCOME */
+/* =========================
+   WELCOME
+========================= */
 
 .dashboard-welcome {
     text-align: center;
@@ -43,7 +45,9 @@
     margin: 18px 0 0;
 }
 
-/* DASHBOARD CARDS */
+/* =========================
+   DASHBOARD CARDS
+========================= */
 
 .dashboard-cards {
     display: grid;
@@ -84,7 +88,119 @@
     margin: 15px 0 0;
 }
 
-/* ADD WORKOUT */
+/* =========================
+   MY PROGRESS
+========================= */
+
+.progress-section {
+    margin-top: 65px;
+    background: #151515;
+    border: 1px solid #282828;
+    padding: 35px;
+    border-radius: 15px;
+}
+
+.progress-section h2 {
+    font-size: 28px;
+    margin: 0 0 8px;
+}
+
+.progress-section>p {
+    color: #777;
+    margin: 0 0 30px;
+    line-height: 1.5;
+}
+
+.progress-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.progress-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.progress-input-group label {
+    color: #aaa;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.progress-input-group input,
+.progress-input-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 14px;
+    background: #0b0b0b;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: white;
+    font-size: 15px;
+    outline: none;
+    font-family: inherit;
+}
+
+.progress-input-group input {
+    height: 50px;
+}
+
+.progress-input-group textarea {
+    padding: 14px;
+    resize: vertical;
+    min-height: 110px;
+}
+
+.progress-input-group input::placeholder,
+.progress-input-group textarea::placeholder {
+    color: #666;
+}
+
+.progress-input-group input:focus,
+.progress-input-group textarea:focus {
+    border-color: #ff3b30;
+}
+
+.progress-notes {
+    grid-column: 1 / -1;
+}
+
+.update-progress-btn {
+    grid-column: 1 / -1;
+    height: 52px;
+    border: none;
+    border-radius: 8px;
+    background: #ff3b30;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.update-progress-btn:hover {
+    background: #ff5147;
+    transform: translateY(-1px);
+}
+
+.update-progress-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.progress-message {
+    margin: 20px 0 0;
+    text-align: center;
+    color: #ff3b30;
+    font-weight: 600;
+}
+
+/* =========================
+   ADD WORKOUT
+========================= */
 
 .add-workout-section {
     margin-top: 65px;
@@ -182,7 +298,9 @@
     font-weight: 600;
 }
 
-/* RECENT ACTIVITY */
+/* =========================
+   RECENT ACTIVITY
+========================= */
 
 .dashboard-activity {
     margin-top: 65px;
@@ -247,7 +365,9 @@
     font-size: 14px;
 }
 
-/* LOADING */
+/* =========================
+   LOADING
+========================= */
 
 .dashboard-loading {
     min-height: 100vh;
@@ -280,7 +400,9 @@
     background: #ff5147;
 }
 
-/* TABLET / MOBILE */
+/* =========================
+   TABLET
+========================= */
 
 @media (max-width: 800px) {
     .dashboard-content {
@@ -306,6 +428,23 @@
         padding: 35px 25px;
     }
 
+    .progress-form {
+        grid-template-columns: 1fr;
+    }
+
+    .progress-notes {
+        grid-column: auto;
+    }
+
+    .update-progress-btn {
+        grid-column: auto;
+    }
+
+    .progress-section {
+        margin-top: 45px;
+        padding: 25px;
+    }
+
     .workout-form {
         grid-template-columns: 1fr;
     }
@@ -325,6 +464,10 @@
     }
 }
 
+/* =========================
+   MOBILE
+========================= */
+
 @media (max-width: 500px) {
     .dashboard-welcome h1 {
         font-size: 32px;
@@ -339,6 +482,12 @@
         font-size: 34px;
     }
 
+    .progress-section h2,
+    .add-workout-section h2,
+    .dashboard-activity h2 {
+        font-size: 24px;
+    }
+
     .activity-item {
         gap: 12px;
     }
@@ -347,10 +496,5 @@
         width: 45px;
         height: 45px;
         font-size: 22px;
-    }
-
-    .add-workout-section h2,
-    .dashboard-activity h2 {
-        font-size: 24px;
     }
 }

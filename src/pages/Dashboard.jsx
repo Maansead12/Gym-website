@@ -10,6 +10,7 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    // Workout states
     const [workoutName, setWorkoutName] = useState("");
     const [workoutType, setWorkoutType] = useState("Strength");
     const [duration, setDuration] = useState("");
@@ -18,6 +19,13 @@ function Dashboard() {
     );
     const [workoutMessage, setWorkoutMessage] = useState("");
     const [addingWorkout, setAddingWorkout] = useState(false);
+
+    // Progress states
+    const [weight, setWeight] = useState("");
+    const [goalPercentage, setGoalPercentage] = useState(0);
+    const [notes, setNotes] = useState("");
+    const [progressMessage, setProgressMessage] = useState("");
+    const [updatingProgress, setUpdatingProgress] = useState(false);
 
     useEffect(() => {
         const token = localStorage.getItem("fitzone_token");
@@ -29,6 +37,7 @@ function Dashboard() {
         }
 
         const currentUser = JSON.parse(savedUser);
+
         setUser(currentUser);
 
         loadDashboard(token);
@@ -56,6 +65,7 @@ function Dashboard() {
                 if (response.status === 401) {
                     localStorage.removeItem("fitzone_token");
                     localStorage.removeItem("fitzone_user");
+
                     navigate("/login");
                     return;
                 }
@@ -66,8 +76,25 @@ function Dashboard() {
             }
 
             setDashboard(data);
+
+            // Load existing progress into the form
+            if (data.progress) {
+                setWeight(
+                    data.progress.weight !== null &&
+                        data.progress.weight !== undefined
+                        ? data.progress.weight
+                        : ""
+                );
+
+                setGoalPercentage(
+                    data.progress.goal_percentage || 0
+                );
+
+                setNotes(data.progress.notes || "");
+            }
         } catch (error) {
             console.error("Dashboard error:", error);
+
             setError("Unable to load your dashboard data.");
         } finally {
             setLoading(false);
@@ -114,6 +141,7 @@ function Dashboard() {
                 setWorkoutMessage(
                     data.message || "Failed to add workout."
                 );
+
                 return;
             }
 
@@ -124,6 +152,7 @@ function Dashboard() {
             setWorkoutName("");
             setWorkoutType("Strength");
             setDuration("");
+
             setWorkoutDate(
                 new Date().toISOString().split("T")[0]
             );
@@ -137,6 +166,72 @@ function Dashboard() {
             );
         } finally {
             setAddingWorkout(false);
+        }
+    }
+
+    async function handleUpdateProgress(event) {
+        event.preventDefault();
+
+        setProgressMessage("");
+
+        if (
+            goalPercentage === "" ||
+            Number(goalPercentage) < 0 ||
+            Number(goalPercentage) > 100
+        ) {
+            setProgressMessage(
+                "Goal percentage must be between 0 and 100."
+            );
+
+            return;
+        }
+
+        try {
+            setUpdatingProgress(true);
+
+            const token = localStorage.getItem("fitzone_token");
+
+            const response = await fetch(
+                "http://localhost:5000/api/progress",
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        weight: weight
+                            ? Number(weight)
+                            : null,
+                        goal_percentage: Number(goalPercentage),
+                        notes: notes.trim(),
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setProgressMessage(
+                    data.message || "Failed to update progress."
+                );
+
+                return;
+            }
+
+            setProgressMessage(
+                "Progress updated successfully! 💪"
+            );
+
+            await loadDashboard(token);
+        } catch (error) {
+            console.error("Progress update error:", error);
+
+            setProgressMessage(
+                "Unable to connect to the server."
+            );
+        } finally {
+            setUpdatingProgress(false);
         }
     }
 
@@ -163,15 +258,20 @@ function Dashboard() {
     }
 
     const membership = dashboard?.membership;
-    const workoutCount = dashboard?.workoutCount || 0;
+
+    const workoutCount =
+        dashboard?.workoutCount || 0;
+
     const progress = dashboard?.progress;
+
     const recentWorkouts =
         dashboard?.recentWorkouts || [];
 
     return (
         <div className="dashboard-page">
-
             <main className="dashboard-content">
+
+                {/* WELCOME */}
 
                 <section className="dashboard-welcome">
                     <p>WELCOME BACK</p>
@@ -185,6 +285,8 @@ function Dashboard() {
                         fitness goals?
                     </p>
                 </section>
+
+                {/* DASHBOARD CARDS */}
 
                 <section className="dashboard-cards">
 
@@ -223,6 +325,88 @@ function Dashboard() {
 
                 </section>
 
+                {/* PROGRESS */}
+
+                <section className="progress-section">
+
+                    <h2>My Progress</h2>
+
+                    <p>
+                        Update your weight and fitness goal progress.
+                    </p>
+
+                    <form
+                        className="progress-form"
+                        onSubmit={handleUpdateProgress}
+                    >
+
+                        <div className="progress-input-group">
+                            <label>Current Weight (kg)</label>
+
+                            <input
+                                type="number"
+                                min="1"
+                                step="0.1"
+                                placeholder="e.g. 85.5"
+                                value={weight}
+                                onChange={(event) =>
+                                    setWeight(event.target.value)
+                                }
+                            />
+                        </div>
+
+                        <div className="progress-input-group">
+                            <label>Goal Progress (%)</label>
+
+                            <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                placeholder="0 - 100"
+                                value={goalPercentage}
+                                onChange={(event) =>
+                                    setGoalPercentage(
+                                        event.target.value
+                                    )
+                                }
+                            />
+                        </div>
+
+                        <div className="progress-input-group progress-notes">
+                            <label>Notes</label>
+
+                            <textarea
+                                placeholder="Write something about your progress..."
+                                value={notes}
+                                onChange={(event) =>
+                                    setNotes(event.target.value)
+                                }
+                                rows="4"
+                            />
+                        </div>
+
+                        <button
+                            className="update-progress-btn"
+                            type="submit"
+                            disabled={updatingProgress}
+                        >
+                            {updatingProgress
+                                ? "Updating..."
+                                : "Update Progress →"}
+                        </button>
+
+                    </form>
+
+                    {progressMessage && (
+                        <p className="progress-message">
+                            {progressMessage}
+                        </p>
+                    )}
+
+                </section>
+
+                {/* ADD WORKOUT */}
+
                 <section className="add-workout-section">
 
                     <h2>Add Workout</h2>
@@ -245,9 +429,7 @@ function Dashboard() {
                                 placeholder="e.g. Chest Workout"
                                 value={workoutName}
                                 onChange={(event) =>
-                                    setWorkoutName(
-                                        event.target.value
-                                    )
+                                    setWorkoutName(event.target.value)
                                 }
                             />
                         </div>
@@ -258,9 +440,7 @@ function Dashboard() {
                             <select
                                 value={workoutType}
                                 onChange={(event) =>
-                                    setWorkoutType(
-                                        event.target.value
-                                    )
+                                    setWorkoutType(event.target.value)
                                 }
                             >
                                 <option value="Strength">
@@ -306,9 +486,7 @@ function Dashboard() {
                                 placeholder="60"
                                 value={duration}
                                 onChange={(event) =>
-                                    setDuration(
-                                        event.target.value
-                                    )
+                                    setDuration(event.target.value)
                                 }
                             />
                         </div>
@@ -320,9 +498,7 @@ function Dashboard() {
                                 type="date"
                                 value={workoutDate}
                                 onChange={(event) =>
-                                    setWorkoutDate(
-                                        event.target.value
-                                    )
+                                    setWorkoutDate(event.target.value)
                                 }
                             />
                         </div>
@@ -347,6 +523,8 @@ function Dashboard() {
 
                 </section>
 
+                {/* RECENT ACTIVITY */}
+
                 <section className="dashboard-activity">
 
                     <h2>Recent Activity</h2>
@@ -365,9 +543,11 @@ function Dashboard() {
                                 className="activity-item"
                                 key={workout.id}
                             >
+
                                 <span>🏋️</span>
 
                                 <div>
+
                                     <strong>
                                         {workout.workout_name}
                                     </strong>
@@ -380,7 +560,9 @@ function Dashboard() {
                                             ? ` • ${workout.duration} min`
                                             : ""}
                                     </p>
+
                                 </div>
+
                             </div>
                         ))
                     )}
@@ -388,7 +570,6 @@ function Dashboard() {
                 </section>
 
             </main>
-
         </div>
     );
 }

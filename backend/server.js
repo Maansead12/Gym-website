@@ -3,9 +3,11 @@ const cors = require("cors");
 require("dotenv").config();
 
 const supabase = require("./config/supabase");
+
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const workoutRoutes = require("./routes/workoutRoutes");
+const progressRoutes = require("./routes/progressRoutes");
 
 const app = express();
 
@@ -32,6 +34,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 app.use("/api/workouts", workoutRoutes);
+
+app.use("/api/progress", progressRoutes);
 
 app.use((req, res) => {
     res.status(404).json({
