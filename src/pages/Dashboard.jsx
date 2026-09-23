@@ -10,7 +10,7 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    // Workout states
+    // Workout
     const [workoutName, setWorkoutName] = useState("");
     const [workoutType, setWorkoutType] = useState("Strength");
     const [duration, setDuration] = useState("");
@@ -20,14 +20,14 @@ function Dashboard() {
     const [workoutMessage, setWorkoutMessage] = useState("");
     const [addingWorkout, setAddingWorkout] = useState(false);
 
-    // Progress states
+    // Progress
     const [weight, setWeight] = useState("");
     const [goalPercentage, setGoalPercentage] = useState(0);
     const [notes, setNotes] = useState("");
     const [progressMessage, setProgressMessage] = useState("");
     const [updatingProgress, setUpdatingProgress] = useState(false);
 
-    // Membership states
+    // Membership
     const [membershipPlan, setMembershipPlan] = useState("Basic");
     const [membershipStartDate, setMembershipStartDate] = useState(
         new Date().toISOString().split("T")[0]
@@ -45,11 +45,14 @@ function Dashboard() {
             return;
         }
 
-        const currentUser = JSON.parse(savedUser);
-
-        setUser(currentUser);
-
-        loadDashboard(token);
+        try {
+            const currentUser = JSON.parse(savedUser);
+            setUser(currentUser);
+            loadDashboard(token);
+        } catch (error) {
+            console.error("User data error:", error);
+            navigate("/login");
+        }
     }, [navigate]);
 
     async function loadDashboard(token) {
@@ -74,7 +77,6 @@ function Dashboard() {
                 if (response.status === 401) {
                     localStorage.removeItem("fitzone_token");
                     localStorage.removeItem("fitzone_user");
-
                     navigate("/login");
                     return;
                 }
@@ -86,7 +88,6 @@ function Dashboard() {
 
             setDashboard(data);
 
-            // Load existing progress
             if (data.progress) {
                 setWeight(
                     data.progress.weight !== null &&
@@ -102,7 +103,6 @@ function Dashboard() {
                 setNotes(data.progress.notes || "");
             }
 
-            // Load existing membership
             if (data.membership) {
                 setMembershipPlan(
                     data.membership.plan || "Basic"
@@ -119,7 +119,6 @@ function Dashboard() {
             }
         } catch (error) {
             console.error("Dashboard error:", error);
-
             setError("Unable to load your dashboard data.");
         } finally {
             setLoading(false);
@@ -128,7 +127,6 @@ function Dashboard() {
 
     async function handleAddWorkout(event) {
         event.preventDefault();
-
         setWorkoutMessage("");
 
         if (!workoutName.trim()) {
@@ -166,7 +164,6 @@ function Dashboard() {
                 setWorkoutMessage(
                     data.message || "Failed to add workout."
                 );
-
                 return;
             }
 
@@ -177,7 +174,6 @@ function Dashboard() {
             setWorkoutName("");
             setWorkoutType("Strength");
             setDuration("");
-
             setWorkoutDate(
                 new Date().toISOString().split("T")[0]
             );
@@ -196,7 +192,6 @@ function Dashboard() {
 
     async function handleUpdateProgress(event) {
         event.preventDefault();
-
         setProgressMessage("");
 
         if (
@@ -207,7 +202,6 @@ function Dashboard() {
             setProgressMessage(
                 "Goal percentage must be between 0 and 100."
             );
-
             return;
         }
 
@@ -228,7 +222,8 @@ function Dashboard() {
                         weight: weight
                             ? Number(weight)
                             : null,
-                        goal_percentage: Number(goalPercentage),
+                        goal_percentage:
+                            Number(goalPercentage),
                         notes: notes.trim(),
                     }),
                 }
@@ -238,9 +233,9 @@ function Dashboard() {
 
             if (!response.ok) {
                 setProgressMessage(
-                    data.message || "Failed to update progress."
+                    data.message ||
+                    "Failed to update progress."
                 );
-
                 return;
             }
 
@@ -250,7 +245,10 @@ function Dashboard() {
 
             await loadDashboard(token);
         } catch (error) {
-            console.error("Progress update error:", error);
+            console.error(
+                "Progress update error:",
+                error
+            );
 
             setProgressMessage(
                 "Unable to connect to the server."
@@ -262,14 +260,12 @@ function Dashboard() {
 
     async function handleUpdateMembership(event) {
         event.preventDefault();
-
         setMembershipMessage("");
 
         if (!membershipPlan) {
             setMembershipMessage(
                 "Please select a membership plan."
             );
-
             return;
         }
 
@@ -277,7 +273,6 @@ function Dashboard() {
             setMembershipMessage(
                 "Please select a start date."
             );
-
             return;
         }
 
@@ -288,7 +283,6 @@ function Dashboard() {
             setMembershipMessage(
                 "End date cannot be before start date."
             );
-
             return;
         }
 
@@ -308,7 +302,8 @@ function Dashboard() {
                     body: JSON.stringify({
                         plan: membershipPlan,
                         start_date: membershipStartDate,
-                        end_date: membershipEndDate || null,
+                        end_date:
+                            membershipEndDate || null,
                     }),
                 }
             );
@@ -320,7 +315,6 @@ function Dashboard() {
                     data.message ||
                     "Failed to update membership."
                 );
-
                 return;
             }
 
@@ -346,7 +340,9 @@ function Dashboard() {
     if (!user || loading) {
         return (
             <div className="dashboard-loading">
+                <div className="loading-spinner"></div>
                 <h2>Loading Dashboard...</h2>
+                <p>Preparing your fitness overview</p>
             </div>
         );
     }
@@ -354,6 +350,7 @@ function Dashboard() {
     if (error) {
         return (
             <div className="dashboard-loading">
+                <div className="error-icon">!</div>
                 <h2>{error}</h2>
 
                 <button
@@ -366,342 +363,652 @@ function Dashboard() {
     }
 
     const membership = dashboard?.membership;
-
-    const workoutCount =
-        dashboard?.workoutCount || 0;
-
+    const workoutCount = dashboard?.workoutCount || 0;
     const progress = dashboard?.progress;
-
     const recentWorkouts =
         dashboard?.recentWorkouts || [];
+
+    const goal = Number(
+        progress?.goal_percentage || 0
+    );
+
+    const membershipStatus =
+        membership?.status || "inactive";
+
+    function getWorkoutIcon(type) {
+        const icons = {
+            Chest: "💪",
+            Back: "🏋️",
+            Legs: "🦵",
+            Shoulders: "🏋️",
+            Arms: "💪",
+            Cardio: "🏃",
+            Strength: "🔥",
+            "Full Body": "⚡",
+        };
+
+        return icons[type] || "🏋️";
+    }
+
+    function formatDate(date) {
+        if (!date) return "—";
+
+        return new Date(
+            `${date}T00:00:00`
+        ).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+        });
+    }
 
     return (
         <div className="dashboard-page">
             <main className="dashboard-content">
 
-                {/* WELCOME */}
+                {/* HERO */}
 
-                <section className="dashboard-welcome">
-                    <p>WELCOME BACK</p>
+                <section className="dashboard-hero">
 
-                    <h1>
-                        Hello, <span>{user.name}</span> 👋
-                    </h1>
+                    <div className="hero-content">
 
-                    <p>
-                        Ready to get stronger and reach your
-                        fitness goals?
-                    </p>
-                </section>
+                        <div className="hero-label">
+                            MEMBER DASHBOARD
+                        </div>
 
-                {/* DASHBOARD CARDS */}
-
-                <section className="dashboard-cards">
-
-                    <div className="dashboard-card">
-                        <h3>Membership</h3>
-
-                        <strong>
-                            {membership?.status
-                                ? membership.status.toUpperCase()
-                                : "NO PLAN"}
-                        </strong>
+                        <h1>
+                            Welcome back,{" "}
+                            <span>{user.name}</span>
+                        </h1>
 
                         <p>
-                            {membership?.plan ||
-                                "No membership yet"}
+                            Track your training, monitor your
+                            progress, and stay consistent.
                         </p>
+
+                        <div className="hero-actions">
+                            <button
+                                onClick={() =>
+                                    document
+                                        .getElementById(
+                                            "workout-section"
+                                        )
+                                        ?.scrollIntoView({
+                                            behavior: "smooth",
+                                        })
+                                }
+                                className="hero-primary-btn"
+                            >
+                                + Add Workout
+                            </button>
+
+                            <button
+                                onClick={() =>
+                                    document
+                                        .getElementById(
+                                            "progress-section"
+                                        )
+                                        ?.scrollIntoView({
+                                            behavior: "smooth",
+                                        })
+                                }
+                                className="hero-secondary-btn"
+                            >
+                                View Progress
+                            </button>
+                        </div>
+
                     </div>
 
-                    <div className="dashboard-card">
-                        <h3>Workouts</h3>
-
-                        <strong>{workoutCount}</strong>
-
-                        <p>This Month</p>
+                    <div className="hero-avatar">
+                        {user.name
+                            ?.charAt(0)
+                            .toUpperCase()}
                     </div>
 
-                    <div className="dashboard-card">
-                        <h3>Progress</h3>
+                </section>
+
+                {/* OVERVIEW */}
+
+                <section className="overview-grid">
+
+                    <div className="overview-card">
+                        <div className="overview-icon membership-icon">
+                            💳
+                        </div>
+
+                        <div>
+                            <span>MEMBERSHIP</span>
+
+                            <strong>
+                                {membership?.plan ||
+                                    "No Plan"}
+                            </strong>
+
+                            <small
+                                className={
+                                    membershipStatus ===
+                                        "active"
+                                        ? "status-active"
+                                        : "status-inactive"
+                                }
+                            >
+                                {membershipStatus}
+                            </small>
+                        </div>
+                    </div>
+
+                    <div className="overview-card">
+                        <div className="overview-icon workout-icon">
+                            🏋️
+                        </div>
+
+                        <div>
+                            <span>WORKOUTS</span>
+
+                            <strong>
+                                {workoutCount}
+                            </strong>
+
+                            <small>
+                                Total recorded
+                            </small>
+                        </div>
+                    </div>
+
+                    <div className="overview-card">
+                        <div className="overview-icon progress-icon">
+                            📈
+                        </div>
+
+                        <div>
+                            <span>GOAL PROGRESS</span>
+
+                            <strong>
+                                {goal}%
+                            </strong>
+
+                            <small>
+                                Current progress
+                            </small>
+                        </div>
+                    </div>
+
+                    <div className="overview-card">
+                        <div className="overview-icon weight-icon">
+                            ⚖️
+                        </div>
+
+                        <div>
+                            <span>WEIGHT</span>
+
+                            <strong>
+                                {progress?.weight
+                                    ? `${progress.weight}`
+                                    : "—"}
+                            </strong>
+
+                            <small>
+                                {progress?.weight
+                                    ? "kg"
+                                    : "Not recorded"}
+                            </small>
+                        </div>
+                    </div>
+
+                </section>
+
+                {/* PROGRESS SNAPSHOT */}
+
+                <section
+                    className="progress-snapshot"
+                    id="progress-section"
+                >
+                    <div className="section-heading">
+                        <div>
+                            <span>YOUR FITNESS JOURNEY</span>
+                            <h2>Progress Snapshot</h2>
+                        </div>
 
                         <strong>
-                            {progress?.goal_percentage || 0}%
+                            {goal}%
                         </strong>
-
-                        <p>Monthly Goal</p>
                     </div>
 
+                    <div className="progress-track">
+                        <div
+                            className="progress-fill"
+                            style={{
+                                width: `${Math.min(
+                                    Math.max(goal, 0),
+                                    100
+                                )}%`,
+                            }}
+                        ></div>
+                    </div>
+
+                    <div className="progress-meta">
+                        <span>0%</span>
+                        <span>Goal completion</span>
+                        <span>100%</span>
+                    </div>
+
+                    <div className="progress-details">
+
+                        <div>
+                            <span>Current Weight</span>
+                            <strong>
+                                {progress?.weight
+                                    ? `${progress.weight} kg`
+                                    : "Not recorded"}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Last Updated</span>
+                            <strong>
+                                {progress?.updated_at
+                                    ? new Date(
+                                        progress.updated_at
+                                    ).toLocaleDateString()
+                                    : "Not recorded"}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Member Since</span>
+                            <strong>
+                                {user.created_at
+                                    ? new Date(
+                                        user.created_at
+                                    ).toLocaleDateString()
+                                    : "—"}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    {progress?.notes && (
+                        <div className="progress-note">
+                            <span>PROGRESS NOTE</span>
+                            <p>
+                                {progress.notes}
+                            </p>
+                        </div>
+                    )}
                 </section>
 
                 {/* MEMBERSHIP */}
 
-                <section className="membership-section">
+                <section className="dashboard-section">
 
-                    <h2>My Membership</h2>
+                    <div className="section-heading">
+                        <div>
+                            <span>MEMBERSHIP</span>
+                            <h2>My Membership</h2>
+                        </div>
+                    </div>
 
-                    <p>
-                        Choose your membership plan and manage
-                        your membership dates.
-                    </p>
+                    <div className="current-membership">
 
-                    <form
-                        className="membership-form"
-                        onSubmit={handleUpdateMembership}
-                    >
+                        <div className="membership-plan-card">
+                            <div className="plan-top">
+                                <span>CURRENT PLAN</span>
 
-                        <div className="membership-input-group">
-                            <label>Membership Plan</label>
+                                <span
+                                    className={
+                                        membershipStatus ===
+                                            "active"
+                                            ? "membership-status active"
+                                            : "membership-status"
+                                    }
+                                >
+                                    {membershipStatus}
+                                </span>
+                            </div>
 
-                            <select
-                                value={membershipPlan}
-                                onChange={(event) =>
-                                    setMembershipPlan(
-                                        event.target.value
-                                    )
+                            <h3>
+                                {membership?.plan ||
+                                    "No Membership"}
+                            </h3>
+
+                            <div className="membership-dates">
+
+                                <div>
+                                    <span>
+                                        START DATE
+                                    </span>
+                                    <strong>
+                                        {formatDate(
+                                            membership?.start_date
+                                        )}
+                                    </strong>
+                                </div>
+
+                                <div>
+                                    <span>
+                                        END DATE
+                                    </span>
+                                    <strong>
+                                        {formatDate(
+                                            membership?.end_date
+                                        )}
+                                    </strong>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <form
+                            className="dashboard-form membership-form"
+                            onSubmit={
+                                handleUpdateMembership
+                            }
+                        >
+                            <div className="form-grid">
+
+                                <div className="form-group">
+                                    <label>
+                                        Membership Plan
+                                    </label>
+
+                                    <select
+                                        value={
+                                            membershipPlan
+                                        }
+                                        onChange={(event) =>
+                                            setMembershipPlan(
+                                                event.target
+                                                    .value
+                                            )
+                                        }
+                                    >
+                                        <option value="Basic">
+                                            Basic
+                                        </option>
+                                        <option value="Premium">
+                                            Premium
+                                        </option>
+                                        <option value="Pro">
+                                            Pro
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label>
+                                        Start Date
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        value={
+                                            membershipStartDate
+                                        }
+                                        onChange={(event) =>
+                                            setMembershipStartDate(
+                                                event.target
+                                                    .value
+                                            )
+                                        }
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>
+                                        End Date
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        value={
+                                            membershipEndDate
+                                        }
+                                        onChange={(event) =>
+                                            setMembershipEndDate(
+                                                event.target
+                                                    .value
+                                            )
+                                        }
+                                    />
+                                </div>
+
+                            </div>
+
+                            <button
+                                className="primary-btn"
+                                type="submit"
+                                disabled={
+                                    updatingMembership
                                 }
                             >
-                                <option value="Basic">
-                                    Basic
-                                </option>
+                                {updatingMembership
+                                    ? "Updating..."
+                                    : "Update Membership →"}
+                            </button>
 
-                                <option value="Premium">
-                                    Premium
-                                </option>
+                            {membershipMessage && (
+                                <p className="form-message">
+                                    {membershipMessage}
+                                </p>
+                            )}
+                        </form>
 
-                                <option value="Pro">
-                                    Pro
-                                </option>
-                            </select>
-                        </div>
-
-                        <div className="membership-input-group">
-                            <label>Start Date</label>
-
-                            <input
-                                type="date"
-                                value={membershipStartDate}
-                                onChange={(event) =>
-                                    setMembershipStartDate(
-                                        event.target.value
-                                    )
-                                }
-                            />
-                        </div>
-
-                        <div className="membership-input-group">
-                            <label>End Date</label>
-
-                            <input
-                                type="date"
-                                value={membershipEndDate}
-                                onChange={(event) =>
-                                    setMembershipEndDate(
-                                        event.target.value
-                                    )
-                                }
-                            />
-                        </div>
-
-                        <button
-                            className="membership-btn"
-                            type="submit"
-                            disabled={updatingMembership}
-                        >
-                            {updatingMembership
-                                ? "Updating..."
-                                : "Update Membership →"}
-                        </button>
-
-                    </form>
-
-                    {membershipMessage && (
-                        <p className="membership-message">
-                            {membershipMessage}
-                        </p>
-                    )}
+                    </div>
 
                 </section>
 
-                {/* PROGRESS */}
+                {/* PROGRESS FORM */}
 
-                <section className="progress-section">
+                <section className="dashboard-section">
 
-                    <h2>My Progress</h2>
-
-                    <p>
-                        Update your weight and fitness goal progress.
-                    </p>
+                    <div className="section-heading">
+                        <div>
+                            <span>FITNESS TRACKING</span>
+                            <h2>Update My Progress</h2>
+                        </div>
+                    </div>
 
                     <form
-                        className="progress-form"
+                        className="dashboard-form"
                         onSubmit={handleUpdateProgress}
                     >
 
-                        <div className="progress-input-group">
-                            <label>Current Weight (kg)</label>
+                        <div className="form-grid">
 
-                            <input
-                                type="number"
-                                min="1"
-                                step="0.1"
-                                placeholder="e.g. 85.5"
-                                value={weight}
-                                onChange={(event) =>
-                                    setWeight(event.target.value)
-                                }
-                            />
+                            <div className="form-group">
+                                <label>
+                                    Current Weight (kg)
+                                </label>
+
+                                <input
+                                    type="number"
+                                    min="1"
+                                    step="0.1"
+                                    placeholder="e.g. 85.5"
+                                    value={weight}
+                                    onChange={(event) =>
+                                        setWeight(
+                                            event.target.value
+                                        )
+                                    }
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>
+                                    Goal Progress (%)
+                                </label>
+
+                                <input
+                                    type="number"
+                                    min="0"
+                                    max="100"
+                                    placeholder="0 - 100"
+                                    value={goalPercentage}
+                                    onChange={(event) =>
+                                        setGoalPercentage(
+                                            event.target.value
+                                        )
+                                    }
+                                />
+                            </div>
+
                         </div>
 
-                        <div className="progress-input-group">
-                            <label>Goal Progress (%)</label>
+                        <div className="form-group full-width">
+                            <label>
+                                Progress Notes
+                            </label>
 
-                            <input
-                                type="number"
-                                min="0"
-                                max="100"
-                                placeholder="0 - 100"
-                                value={goalPercentage}
+                            <textarea
+                                rows="5"
+                                placeholder="Write something about your training, nutrition, consistency, recovery, or goals..."
+                                value={notes}
                                 onChange={(event) =>
-                                    setGoalPercentage(
+                                    setNotes(
                                         event.target.value
                                     )
                                 }
                             />
                         </div>
 
-                        <div className="progress-input-group progress-notes">
-                            <label>Notes</label>
-
-                            <textarea
-                                placeholder="Write something about your progress..."
-                                value={notes}
-                                onChange={(event) =>
-                                    setNotes(event.target.value)
-                                }
-                                rows="4"
-                            />
-                        </div>
-
                         <button
-                            className="update-progress-btn"
+                            className="primary-btn"
                             type="submit"
                             disabled={updatingProgress}
                         >
                             {updatingProgress
                                 ? "Updating..."
-                                : "Update Progress →"}
+                                : "Save Progress →"}
                         </button>
 
-                    </form>
+                        {progressMessage && (
+                            <p className="form-message">
+                                {progressMessage}
+                            </p>
+                        )}
 
-                    {progressMessage && (
-                        <p className="progress-message">
-                            {progressMessage}
-                        </p>
-                    )}
+                    </form>
 
                 </section>
 
                 {/* ADD WORKOUT */}
 
-                <section className="add-workout-section">
+                <section
+                    className="dashboard-section"
+                    id="workout-section"
+                >
 
-                    <h2>Add Workout</h2>
-
-                    <p>
-                        Record your workout and keep track of
-                        your fitness activity.
-                    </p>
+                    <div className="section-heading">
+                        <div>
+                            <span>TRAINING LOG</span>
+                            <h2>Add Workout</h2>
+                        </div>
+                    </div>
 
                     <form
-                        className="workout-form"
+                        className="dashboard-form"
                         onSubmit={handleAddWorkout}
                     >
 
-                        <div className="workout-input-group">
-                            <label>Workout Name</label>
+                        <div className="form-grid">
 
-                            <input
-                                type="text"
-                                placeholder="e.g. Chest Workout"
-                                value={workoutName}
-                                onChange={(event) =>
-                                    setWorkoutName(event.target.value)
-                                }
-                            />
-                        </div>
+                            <div className="form-group">
+                                <label>
+                                    Workout Name
+                                </label>
 
-                        <div className="workout-input-group">
-                            <label>Workout Type</label>
+                                <input
+                                    type="text"
+                                    placeholder="e.g. Chest Workout"
+                                    value={workoutName}
+                                    onChange={(event) =>
+                                        setWorkoutName(
+                                            event.target.value
+                                        )
+                                    }
+                                />
+                            </div>
 
-                            <select
-                                value={workoutType}
-                                onChange={(event) =>
-                                    setWorkoutType(event.target.value)
-                                }
-                            >
-                                <option value="Strength">
-                                    Strength
-                                </option>
+                            <div className="form-group">
+                                <label>
+                                    Workout Type
+                                </label>
 
-                                <option value="Cardio">
-                                    Cardio
-                                </option>
+                                <select
+                                    value={workoutType}
+                                    onChange={(event) =>
+                                        setWorkoutType(
+                                            event.target.value
+                                        )
+                                    }
+                                >
+                                    <option value="Strength">
+                                        Strength
+                                    </option>
+                                    <option value="Cardio">
+                                        Cardio
+                                    </option>
+                                    <option value="Chest">
+                                        Chest
+                                    </option>
+                                    <option value="Back">
+                                        Back
+                                    </option>
+                                    <option value="Legs">
+                                        Legs
+                                    </option>
+                                    <option value="Shoulders">
+                                        Shoulders
+                                    </option>
+                                    <option value="Arms">
+                                        Arms
+                                    </option>
+                                    <option value="Full Body">
+                                        Full Body
+                                    </option>
+                                </select>
+                            </div>
 
-                                <option value="Chest">
-                                    Chest
-                                </option>
+                            <div className="form-group">
+                                <label>
+                                    Duration (minutes)
+                                </label>
 
-                                <option value="Back">
-                                    Back
-                                </option>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    placeholder="60"
+                                    value={duration}
+                                    onChange={(event) =>
+                                        setDuration(
+                                            event.target.value
+                                        )
+                                    }
+                                />
+                            </div>
 
-                                <option value="Legs">
-                                    Legs
-                                </option>
+                            <div className="form-group">
+                                <label>
+                                    Workout Date
+                                </label>
 
-                                <option value="Shoulders">
-                                    Shoulders
-                                </option>
+                                <input
+                                    type="date"
+                                    value={workoutDate}
+                                    onChange={(event) =>
+                                        setWorkoutDate(
+                                            event.target.value
+                                        )
+                                    }
+                                />
+                            </div>
 
-                                <option value="Arms">
-                                    Arms
-                                </option>
-
-                                <option value="Full Body">
-                                    Full Body
-                                </option>
-                            </select>
-                        </div>
-
-                        <div className="workout-input-group">
-                            <label>Duration (minutes)</label>
-
-                            <input
-                                type="number"
-                                min="1"
-                                placeholder="60"
-                                value={duration}
-                                onChange={(event) =>
-                                    setDuration(event.target.value)
-                                }
-                            />
-                        </div>
-
-                        <div className="workout-input-group">
-                            <label>Workout Date</label>
-
-                            <input
-                                type="date"
-                                value={workoutDate}
-                                onChange={(event) =>
-                                    setWorkoutDate(event.target.value)
-                                }
-                            />
                         </div>
 
                         <button
-                            className="add-workout-btn"
+                            className="primary-btn"
                             type="submit"
                             disabled={addingWorkout}
                         >
@@ -710,58 +1017,93 @@ function Dashboard() {
                                 : "Add Workout →"}
                         </button>
 
-                    </form>
+                        {workoutMessage && (
+                            <p className="form-message">
+                                {workoutMessage}
+                            </p>
+                        )}
 
-                    {workoutMessage && (
-                        <p className="workout-message">
-                            {workoutMessage}
-                        </p>
-                    )}
+                    </form>
 
                 </section>
 
-                {/* RECENT ACTIVITY */}
+                {/* RECENT WORKOUTS */}
 
-                <section className="dashboard-activity">
+                <section className="dashboard-section">
 
-                    <h2>Recent Activity</h2>
+                    <div className="section-heading">
+                        <div>
+                            <span>TRAINING HISTORY</span>
+                            <h2>Recent Workouts</h2>
+                        </div>
+
+                        <span className="activity-count">
+                            {recentWorkouts.length} recorded
+                        </span>
+                    </div>
 
                     {recentWorkouts.length === 0 ? (
-                        <div className="activity-empty">
-                            <p>No workouts recorded yet.</p>
-
-                            <span>
-                                Add your first workout above.
-                            </span>
+                        <div className="empty-state">
+                            <div>🏋️</div>
+                            <h3>No workouts yet</h3>
+                            <p>
+                                Add your first workout to
+                                start building your training
+                                history.
+                            </p>
                         </div>
                     ) : (
-                        recentWorkouts.map((workout) => (
-                            <div
-                                className="activity-item"
-                                key={workout.id}
-                            >
+                        <div className="workout-list">
 
-                                <span>🏋️</span>
+                            {recentWorkouts.map(
+                                (workout) => (
+                                    <div
+                                        className="workout-item"
+                                        key={workout.id}
+                                    >
 
-                                <div>
+                                        <div className="workout-icon">
+                                            {getWorkoutIcon(
+                                                workout.workout_type
+                                            )}
+                                        </div>
 
-                                    <strong>
-                                        {workout.workout_name}
-                                    </strong>
+                                        <div className="workout-info">
+                                            <strong>
+                                                {
+                                                    workout.workout_name
+                                                }
+                                            </strong>
 
-                                    <p>
-                                        {workout.workout_type ||
-                                            "Workout"}
+                                            <span>
+                                                {
+                                                    workout.workout_type ||
+                                                    "Workout"
+                                                }
+                                            </span>
+                                        </div>
 
-                                        {workout.duration
-                                            ? ` • ${workout.duration} min`
-                                            : ""}
-                                    </p>
+                                        <div className="workout-meta">
 
-                                </div>
+                                            <strong>
+                                                {workout.duration
+                                                    ? `${workout.duration} min`
+                                                    : "—"}
+                                            </strong>
 
-                            </div>
-                        ))
+                                            <span>
+                                                {formatDate(
+                                                    workout.workout_date
+                                                )}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+                                )
+                            )}
+
+                        </div>
                     )}
 
                 </section>
