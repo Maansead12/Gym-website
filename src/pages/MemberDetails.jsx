@@ -24,6 +24,199 @@ function MemberDetails() {
     const [editMessage, setEditMessage] = useState("");
     const [updatingMember, setUpdatingMember] = useState(false);
 
+
+    /* =========================
+       WORKOUT MANAGEMENT
+    ========================= */
+
+    async function handleAddWorkout(event) {
+        event.preventDefault();
+        setWorkoutMessage("");
+
+        if (!workoutName.trim()) {
+            setWorkoutMessage("Workout name is required.");
+            return;
+        }
+
+        try {
+            setAddingWorkout(true);
+            const token = localStorage.getItem("fitzone_token");
+
+            const response = await fetch(
+                `http://localhost:5000/api/admin/members/${id}/workouts`,
+                {
+                    method: "POST",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        workout_name: workoutName.trim(),
+                        workout_type: workoutType,
+                        duration: workoutDuration ? Number(workoutDuration) : null,
+                        workout_date: workoutDate || null,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setWorkoutMessage(data.message || "Failed to add workout.");
+                return;
+            }
+
+            setWorkoutMessage("Workout added successfully! ✓");
+            setWorkoutName("");
+            setWorkoutType("Strength");
+            setWorkoutDuration("");
+            setWorkoutDate(new Date().toISOString().split("T")[0]);
+
+            await loadMemberDetails(token, false);
+        } catch (error) {
+            console.error("Admin add workout error:", error);
+            setWorkoutMessage("Unable to connect to the server.");
+        } finally {
+            setAddingWorkout(false);
+        }
+    }
+
+    function startEditWorkout(workout) {
+        setEditingWorkoutId(workout.id);
+        setEditingWorkoutName(workout.workout_name || "");
+        setEditingWorkoutType(workout.workout_type || "Strength");
+        setEditingWorkoutDuration(workout.duration ?? "");
+        setEditingWorkoutDate(workout.workout_date || "");
+        setEditingWorkoutMessage("");
+    }
+
+    function cancelEditWorkout() {
+        setEditingWorkoutId(null);
+        setEditingWorkoutName("");
+        setEditingWorkoutType("Strength");
+        setEditingWorkoutDuration("");
+        setEditingWorkoutDate("");
+        setEditingWorkoutMessage("");
+    }
+
+    async function handleUpdateWorkout(event) {
+        event.preventDefault();
+        setEditingWorkoutMessage("");
+
+        if (!editingWorkoutName.trim()) {
+            setEditingWorkoutMessage("Workout name is required.");
+            return;
+        }
+
+        try {
+            setUpdatingWorkout(true);
+            const token = localStorage.getItem("fitzone_token");
+
+            const response = await fetch(
+                `http://localhost:5000/api/admin/workouts/${editingWorkoutId}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        workout_name: editingWorkoutName.trim(),
+                        workout_type: editingWorkoutType,
+                        duration: editingWorkoutDuration
+                            ? Number(editingWorkoutDuration)
+                            : null,
+                        workout_date: editingWorkoutDate || null,
+                    }),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setEditingWorkoutMessage(
+                    data.message || "Failed to update workout."
+                );
+                return;
+            }
+
+            setEditingWorkoutMessage("Workout updated successfully! ✓");
+            await loadMemberDetails(token, false);
+
+            setTimeout(() => {
+                cancelEditWorkout();
+            }, 500);
+        } catch (error) {
+            console.error("Admin update workout error:", error);
+            setEditingWorkoutMessage("Unable to connect to the server.");
+        } finally {
+            setUpdatingWorkout(false);
+        }
+    }
+
+    function openWorkoutDeleteConfirm(workout) {
+        setWorkoutToDelete(workout);
+        setShowWorkoutDeleteConfirm(true);
+        setWorkoutDeleteMessage("");
+    }
+
+    function closeWorkoutDeleteConfirm() {
+        if (deletingWorkoutId) {
+            return;
+        }
+
+        setShowWorkoutDeleteConfirm(false);
+        setWorkoutToDelete(null);
+    }
+
+    async function handleDeleteWorkout() {
+        if (!workoutToDelete?.id) {
+            return;
+        }
+
+        try {
+            setDeletingWorkoutId(workoutToDelete.id);
+            setWorkoutDeleteMessage("");
+
+            const token = localStorage.getItem("fitzone_token");
+
+            const response = await fetch(
+                `http://localhost:5000/api/admin/workouts/${workoutToDelete.id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setWorkoutDeleteMessage(
+                    data.message || "Failed to delete workout."
+                );
+                return;
+            }
+
+            if (editingWorkoutId === workoutToDelete.id) {
+                cancelEditWorkout();
+            }
+
+            setShowWorkoutDeleteConfirm(false);
+            setWorkoutToDelete(null);
+            setWorkoutDeleteMessage("Workout deleted successfully! ✓");
+
+            await loadMemberDetails(token, false);
+        } catch (error) {
+            console.error("Admin delete workout error:", error);
+            setWorkoutDeleteMessage("Unable to connect to the server.");
+        } finally {
+            setDeletingWorkoutId(null);
+        }
+    }
+
     /* =========================
        DELETE MEMBER
     ========================= */
@@ -61,6 +254,32 @@ function MemberDetails() {
         useState(false);
 
     /* =========================
+       WORKOUT MANAGEMENT
+    ========================= */
+
+    const [workoutName, setWorkoutName] = useState("");
+    const [workoutType, setWorkoutType] = useState("Strength");
+    const [workoutDuration, setWorkoutDuration] = useState("");
+    const [workoutDate, setWorkoutDate] = useState(
+        new Date().toISOString().split("T")[0]
+    );
+    const [workoutMessage, setWorkoutMessage] = useState("");
+    const [addingWorkout, setAddingWorkout] = useState(false);
+
+    const [editingWorkoutId, setEditingWorkoutId] = useState(null);
+    const [editingWorkoutName, setEditingWorkoutName] = useState("");
+    const [editingWorkoutType, setEditingWorkoutType] = useState("Strength");
+    const [editingWorkoutDuration, setEditingWorkoutDuration] = useState("");
+    const [editingWorkoutDate, setEditingWorkoutDate] = useState("");
+    const [editingWorkoutMessage, setEditingWorkoutMessage] = useState("");
+    const [updatingWorkout, setUpdatingWorkout] = useState(false);
+
+    const [deletingWorkoutId, setDeletingWorkoutId] = useState(null);
+    const [workoutDeleteMessage, setWorkoutDeleteMessage] = useState("");
+    const [showWorkoutDeleteConfirm, setShowWorkoutDeleteConfirm] = useState(false);
+    const [workoutToDelete, setWorkoutToDelete] = useState(null);
+
+    /* =========================
        LOAD MEMBER
     ========================= */
 
@@ -84,9 +303,11 @@ function MemberDetails() {
         loadMemberDetails(token);
     }, [id, navigate]);
 
-    async function loadMemberDetails(token) {
+    async function loadMemberDetails(token, showPageLoading = true) {
         try {
-            setLoading(true);
+            if (showPageLoading) {
+                setLoading(true);
+            }
             setError("");
 
             const response = await fetch(
@@ -185,7 +406,9 @@ function MemberDetails() {
                 "Unable to load member details."
             );
         } finally {
-            setLoading(false);
+            if (showPageLoading) {
+                setLoading(false);
+            }
         }
     }
 
@@ -774,8 +997,8 @@ function MemberDetails() {
 
                     <span
                         className={`member-role-badge ${member?.role === "admin"
-                                ? "profile-admin"
-                                : "profile-member"
+                            ? "profile-admin"
+                            : "profile-member"
                             }`}
                     >
                         {member?.role}
@@ -1533,85 +1756,228 @@ function MemberDetails() {
                 </section>
 
                 {/* =========================
-                    WORKOUT HISTORY
+                    WORKOUT MANAGEMENT
                 ========================= */}
 
-                <section className="member-info-section">
+                <section className="member-info-section workout-management-section">
                     <div className="section-heading">
                         <div>
-                            <span>
-                                ACTIVITY
-                            </span>
+                            <span>TRAINING MANAGEMENT</span>
+                            <h2>Workout Management</h2>
+                            <p>Add, edit, and remove workouts for this member.</p>
+                        </div>
+                        <span className="section-number">07</span>
+                    </div>
 
-                            <h2>
-                                Workout History
-                            </h2>
-
-                            <p>
-                                {workouts.length} recorded
-                                workout
-                                {workouts.length === 1
-                                    ? ""
-                                    : "s"}
-                            </p>
+                    <form
+                        className="edit-member-form workout-admin-form"
+                        onSubmit={handleAddWorkout}
+                    >
+                        <div className="edit-input-group">
+                            <label>Workout Name</label>
+                            <input
+                                type="text"
+                                value={workoutName}
+                                onChange={(event) => setWorkoutName(event.target.value)}
+                                placeholder="e.g. Chest Workout"
+                            />
                         </div>
 
-                        <span className="section-number">
-                            07
-                        </span>
+                        <div className="edit-input-group">
+                            <label>Workout Type</label>
+                            <select
+                                value={workoutType}
+                                onChange={(event) => setWorkoutType(event.target.value)}
+                            >
+                                <option value="Strength">Strength</option>
+                                <option value="Cardio">Cardio</option>
+                                <option value="Chest">Chest</option>
+                                <option value="Back">Back</option>
+                                <option value="Legs">Legs</option>
+                                <option value="Shoulders">Shoulders</option>
+                                <option value="Arms">Arms</option>
+                                <option value="Full Body">Full Body</option>
+                            </select>
+                        </div>
+
+                        <div className="edit-input-group">
+                            <label>Duration (minutes)</label>
+                            <input
+                                type="number"
+                                min="1"
+                                value={workoutDuration}
+                                onChange={(event) => setWorkoutDuration(event.target.value)}
+                                placeholder="60"
+                            />
+                        </div>
+
+                        <div className="edit-input-group">
+                            <label>Workout Date</label>
+                            <input
+                                type="date"
+                                value={workoutDate}
+                                onChange={(event) => setWorkoutDate(event.target.value)}
+                            />
+                        </div>
+
+                        <button
+                            className="update-member-btn"
+                            type="submit"
+                            disabled={addingWorkout}
+                        >
+                            {addingWorkout ? "Adding Workout..." : "Add Workout →"}
+                        </button>
+                    </form>
+
+                    {workoutMessage && (
+                        <p className="edit-member-message">{workoutMessage}</p>
+                    )}
+
+                    {workoutDeleteMessage && (
+                        <p className="edit-member-message">{workoutDeleteMessage}</p>
+                    )}
+
+                    <div className="workout-history-header">
+                        <div>
+                            <span className="workout-history-label">ACTIVITY HISTORY</span>
+                            <h3>
+                                {workouts.length} recorded workout
+                                {workouts.length === 1 ? "" : "s"}
+                            </h3>
+                        </div>
                     </div>
 
                     {workouts.length === 0 ? (
                         <div className="member-empty">
-                            <p>
-                                No workouts recorded.
-                            </p>
+                            <p>No workouts recorded.</p>
                         </div>
                     ) : (
                         <div className="member-workouts">
-                            {workouts.map(
-                                (workout) => (
-                                    <div
-                                        className="member-workout"
-                                        key={workout.id}
-                                    >
-                                        <div className="workout-icon">
-                                            {getWorkoutIcon(
-                                                workout.workout_type
-                                            )}
-                                        </div>
-
-                                        <div className="workout-details">
-                                            <strong>
-                                                {
-                                                    workout.workout_name
-                                                }
-                                            </strong>
-
-                                            <p>
-                                                {workout.workout_type ||
-                                                    "Workout"}
-
-                                                {workout.duration
-                                                    ? ` • ${workout.duration} min`
-                                                    : ""}
-                                            </p>
-
-                                            <span>
-                                                {formatDate(
-                                                    workout.workout_date
-                                                )}
-                                            </span>
-                                        </div>
-
-                                        <div className="workout-duration">
-                                            {workout.duration
-                                                ? `${workout.duration} min`
-                                                : "—"}
-                                        </div>
+                            {workouts.map((workout) => (
+                                <div
+                                    className="member-workout workout-admin-item"
+                                    key={workout.id}
+                                >
+                                    <div className="workout-icon">
+                                        {getWorkoutIcon(workout.workout_type)}
                                     </div>
-                                )
-                            )}
+
+                                    {editingWorkoutId === workout.id ? (
+                                        <form
+                                            className="workout-edit-form"
+                                            onSubmit={handleUpdateWorkout}
+                                        >
+                                            <div className="workout-edit-grid">
+                                                <input
+                                                    type="text"
+                                                    value={editingWorkoutName}
+                                                    onChange={(event) =>
+                                                        setEditingWorkoutName(event.target.value)
+                                                    }
+                                                    placeholder="Workout name"
+                                                />
+
+                                                <select
+                                                    value={editingWorkoutType}
+                                                    onChange={(event) =>
+                                                        setEditingWorkoutType(event.target.value)
+                                                    }
+                                                >
+                                                    <option value="Strength">Strength</option>
+                                                    <option value="Cardio">Cardio</option>
+                                                    <option value="Chest">Chest</option>
+                                                    <option value="Back">Back</option>
+                                                    <option value="Legs">Legs</option>
+                                                    <option value="Shoulders">Shoulders</option>
+                                                    <option value="Arms">Arms</option>
+                                                    <option value="Full Body">Full Body</option>
+                                                </select>
+
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={editingWorkoutDuration}
+                                                    onChange={(event) =>
+                                                        setEditingWorkoutDuration(event.target.value)
+                                                    }
+                                                    placeholder="Minutes"
+                                                />
+
+                                                <input
+                                                    type="date"
+                                                    value={editingWorkoutDate}
+                                                    onChange={(event) =>
+                                                        setEditingWorkoutDate(event.target.value)
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div className="workout-edit-actions">
+                                                <button
+                                                    className="update-member-btn workout-save-btn"
+                                                    type="submit"
+                                                    disabled={updatingWorkout}
+                                                >
+                                                    {updatingWorkout ? "Saving..." : "Save Changes"}
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="workout-cancel-btn"
+                                                    onClick={cancelEditWorkout}
+                                                    disabled={updatingWorkout}
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+
+                                            {editingWorkoutMessage && (
+                                                <p className="edit-member-message">
+                                                    {editingWorkoutMessage}
+                                                </p>
+                                            )}
+                                        </form>
+                                    ) : (
+                                        <>
+                                            <div className="workout-details">
+                                                <strong>{workout.workout_name}</strong>
+                                                <p>
+                                                    {workout.workout_type || "Workout"}
+                                                    {workout.duration
+                                                        ? ` • ${workout.duration} min`
+                                                        : ""}
+                                                </p>
+                                                <span>{formatDate(workout.workout_date)}</span>
+                                            </div>
+
+                                            <div className="workout-duration">
+                                                {workout.duration
+                                                    ? `${workout.duration} min`
+                                                    : "—"}
+                                            </div>
+
+                                            <div className="workout-admin-actions">
+                                                <button
+                                                    type="button"
+                                                    className="workout-edit-btn"
+                                                    onClick={() => startEditWorkout(workout)}
+                                                >
+                                                    Edit
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="workout-delete-btn"
+                                                    onClick={() => openWorkoutDeleteConfirm(workout)}
+                                                    disabled={deletingWorkoutId === workout.id}
+                                                >
+                                                    {deletingWorkoutId === workout.id ? "..." : "Delete"}
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </section>
@@ -1661,6 +2027,69 @@ function MemberDetails() {
                     )}
                 </section>
             </main>
+
+            {/* =========================
+                WORKOUT DELETE MODAL
+            ========================= */}
+
+            {showWorkoutDeleteConfirm && (
+                <div className="delete-modal-overlay">
+                    <div className="delete-modal workout-delete-modal">
+                        <div className="delete-modal-icon">
+                            ⚠️
+                        </div>
+
+                        <span className="modal-label">
+                            WORKOUT ACTION
+                        </span>
+
+                        <h2>
+                            Delete Workout?
+                        </h2>
+
+                        <p>
+                            Are you sure you want to
+                            delete{" "}
+                            <strong>
+                                {workoutToDelete?.workout_name}
+                            </strong>
+                            ?
+                        </p>
+
+                        <p className="delete-warning">
+                            This workout will be permanently
+                            removed from this member's
+                            workout history.
+                        </p>
+
+                        {workoutDeleteMessage && (
+                            <p className="delete-member-message">
+                                {workoutDeleteMessage}
+                            </p>
+                        )}
+
+                        <div className="delete-modal-actions">
+                            <button
+                                className="cancel-delete-btn"
+                                onClick={closeWorkoutDeleteConfirm}
+                                disabled={!!deletingWorkoutId}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                className="confirm-delete-btn"
+                                onClick={handleDeleteWorkout}
+                                disabled={!!deletingWorkoutId}
+                            >
+                                {deletingWorkoutId
+                                    ? "Deleting..."
+                                    : "Yes, Delete"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* =========================
                 DELETE MODAL

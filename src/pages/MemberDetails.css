@@ -1090,3 +1090,189 @@
         flex-direction: column;
     }
 }
+
+/* =========================
+   ADMIN WORKOUT MANAGEMENT
+========================= */
+
+.workout-management-section {
+    overflow: hidden;
+}
+
+.workout-admin-form {
+    margin-top: 25px;
+}
+
+.workout-history-header {
+    margin: 35px 0 18px;
+    padding-top: 25px;
+    border-top: 1px solid #292929;
+}
+
+.workout-history-label {
+    display: block;
+    color: #ff3b30;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 7px;
+}
+
+.workout-history-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.workout-admin-item {
+    position: relative;
+}
+
+.workout-admin-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.workout-edit-btn,
+.workout-delete-btn,
+.workout-cancel-btn {
+    height: 36px;
+    padding: 0 13px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.workout-edit-btn {
+    border: 1px solid #444;
+    background: #202020;
+    color: white;
+}
+
+.workout-edit-btn:hover {
+    border-color: #ff3b30;
+    background: #252525;
+}
+
+.workout-delete-btn {
+    border: 1px solid #542522;
+    background: #241313;
+    color: #ff6b63;
+}
+
+.workout-delete-btn:hover {
+    background: #351615;
+    border-color: #ff3b30;
+}
+
+.workout-delete-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.workout-edit-form {
+    flex: 1;
+    min-width: 0;
+}
+
+.workout-edit-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 0.8fr 1fr;
+    gap: 10px;
+}
+
+.workout-edit-grid input,
+.workout-edit-grid select {
+    width: 100%;
+    height: 42px;
+    box-sizing: border-box;
+    padding: 0 11px;
+    border: 1px solid #333;
+    border-radius: 7px;
+    background: #0d0d0d;
+    color: white;
+    outline: none;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.workout-edit-grid input:focus,
+.workout-edit-grid select:focus {
+    border-color: #ff3b30;
+}
+
+.workout-edit-grid select option {
+    background: #171717;
+    color: white;
+}
+
+.workout-edit-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.workout-save-btn {
+    width: auto;
+    min-width: 140px;
+    margin-top: 0;
+    height: 42px;
+}
+
+.workout-cancel-btn {
+    border: 1px solid #333;
+    background: #202020;
+    color: #aaa;
+}
+
+.workout-cancel-btn:hover {
+    color: white;
+    border-color: #555;
+}
+
+.workout-cancel-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 800px) {
+    .workout-admin-item {
+        flex-wrap: wrap;
+    }
+
+    .workout-admin-actions {
+        width: 100%;
+        margin-left: 0;
+        padding-left: 65px;
+    }
+
+    .workout-edit-form {
+        width: calc(100% - 65px);
+    }
+
+    .workout-edit-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 500px) {
+    .workout-edit-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .workout-admin-actions {
+        padding-left: 0;
+    }
+
+    .workout-edit-actions {
+        flex-direction: column;
+    }
+
+    .workout-save-btn,
+    .workout-cancel-btn {
+        width: 100%;
+    }
+}

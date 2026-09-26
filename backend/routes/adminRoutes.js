@@ -11,11 +11,17 @@ const {
     getAdminStats,
     updateMemberMembership,
     updateMemberProgress,
+    addMemberWorkout,
+    updateMemberWorkout,
+    deleteMemberWorkout,
 } = require("../controllers/adminController");
 
 const router = express.Router();
 
-/* ADMIN STATS */
+
+// =========================
+// ADMIN STATS
+// =========================
 
 router.get(
     "/stats",
@@ -24,7 +30,10 @@ router.get(
     getAdminStats
 );
 
-/* ALL MEMBERS */
+
+// =========================
+// MEMBERS
+// =========================
 
 router.get(
     "/members",
@@ -33,16 +42,12 @@ router.get(
     getAllMembers
 );
 
-/* MEMBER DETAILS */
-
 router.get(
     "/members/:id",
     authenticateToken,
     requireAdmin,
     getMemberDetails
 );
-
-/* UPDATE MEMBER */
 
 router.put(
     "/members/:id",
@@ -51,7 +56,17 @@ router.put(
     updateMember
 );
 
-/* UPDATE MEMBERSHIP */
+router.delete(
+    "/members/:id",
+    authenticateToken,
+    requireAdmin,
+    deleteMember
+);
+
+
+// =========================
+// MEMBERSHIP
+// =========================
 
 router.put(
     "/members/:id/membership",
@@ -60,7 +75,10 @@ router.put(
     updateMemberMembership
 );
 
-/* UPDATE PROGRESS */
+
+// =========================
+// PROGRESS
+// =========================
 
 router.put(
     "/members/:id/progress",
@@ -69,13 +87,36 @@ router.put(
     updateMemberProgress
 );
 
-/* DELETE MEMBER */
 
-router.delete(
-    "/members/:id",
+// =========================
+// WORKOUTS
+// =========================
+
+// Add workout for member
+router.post(
+    "/members/:id/workouts",
     authenticateToken,
     requireAdmin,
-    deleteMember
+    addMemberWorkout
 );
+
+
+// Edit workout
+router.put(
+    "/workouts/:workoutId",
+    authenticateToken,
+    requireAdmin,
+    updateMemberWorkout
+);
+
+
+// Delete workout
+router.delete(
+    "/workouts/:workoutId",
+    authenticateToken,
+    requireAdmin,
+    deleteMemberWorkout
+);
+
 
 module.exports = router;
