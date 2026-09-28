@@ -19,6 +19,16 @@ function Dashboard() {
     );
     const [workoutMessage, setWorkoutMessage] = useState("");
     const [addingWorkout, setAddingWorkout] = useState(false);
+    const [editingWorkoutId, setEditingWorkoutId] = useState(null);
+    const [editingWorkoutName, setEditingWorkoutName] = useState("");
+    const [editingWorkoutType, setEditingWorkoutType] = useState("Strength");
+    const [editingDuration, setEditingDuration] = useState("");
+    const [editingWorkoutDate, setEditingWorkoutDate] = useState("");
+    const [updatingWorkout, setUpdatingWorkout] = useState(false);
+    const [deletingWorkoutId, setDeletingWorkoutId] = useState(null);
+    const [workoutToDelete, setWorkoutToDelete] = useState(null);
+    const [showWorkoutDeleteConfirm, setShowWorkoutDeleteConfirm] = useState(false);
+    const [workoutDeleteMessage, setWorkoutDeleteMessage] = useState("");
 
     // Progress
     const [weight, setWeight] = useState("");
@@ -36,6 +46,17 @@ function Dashboard() {
     const [membershipMessage, setMembershipMessage] = useState("");
     const [updatingMembership, setUpdatingMembership] = useState(false);
 
+    // Profile
+    const [profileName, setProfileName] = useState("");
+    const [profileEmail, setProfileEmail] = useState("");
+    const [profileMessage, setProfileMessage] = useState("");
+    const [updatingProfile, setUpdatingProfile] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [passwordMessage, setPasswordMessage] = useState("");
+    const [changingPassword, setChangingPassword] = useState(false);
+
     useEffect(() => {
         const token = localStorage.getItem("fitzone_token");
         const savedUser = localStorage.getItem("fitzone_user");
@@ -48,6 +69,8 @@ function Dashboard() {
         try {
             const currentUser = JSON.parse(savedUser);
             setUser(currentUser);
+            setProfileName(currentUser.name || "");
+            setProfileEmail(currentUser.email || "");
             loadDashboard(token);
         } catch (error) {
             console.error("User data error:", error);
@@ -55,9 +78,9 @@ function Dashboard() {
         }
     }, [navigate]);
 
-    async function loadDashboard(token) {
+    async function loadDashboard(token, showLoader = true) {
         try {
-            setLoading(true);
+            if (showLoader) setLoading(true);
             setError("");
 
             const response = await fetch(
@@ -121,7 +144,7 @@ function Dashboard() {
             console.error("Dashboard error:", error);
             setError("Unable to load your dashboard data.");
         } finally {
-            setLoading(false);
+            if (showLoader) setLoading(false);
         }
     }
 
@@ -178,7 +201,7 @@ function Dashboard() {
                 new Date().toISOString().split("T")[0]
             );
 
-            await loadDashboard(token);
+            await loadDashboard(token, false);
         } catch (error) {
             console.error("Add workout error:", error);
 
@@ -187,6 +210,221 @@ function Dashboard() {
             );
         } finally {
             setAddingWorkout(false);
+        }
+    }
+
+    function startEditWorkout(workout) {
+        setEditingWorkoutId(workout.id);
+        setEditingWorkoutName(workout.workout_name || "");
+        setEditingWorkoutType(workout.workout_type || "Strength");
+        setEditingDuration(workout.duration ?? "");
+        setEditingWorkoutDate(workout.workout_date || "");
+        setWorkoutMessage("");
+        setWorkoutDeleteMessage("");
+    }
+
+    function cancelEditWorkout() {
+        setEditingWorkoutId(null);
+        setEditingWorkoutName("");
+        setEditingWorkoutType("Strength");
+        setEditingDuration("");
+        setEditingWorkoutDate("");
+    }
+
+    async function handleUpdateWorkout(event) {
+        event.preventDefault();
+        setWorkoutMessage("");
+
+        if (!editingWorkoutName.trim()) {
+            setWorkoutMessage("Workout name is required.");
+            return;
+        }
+
+        try {
+            setUpdatingWorkout(true);
+            const token = localStorage.getItem("fitzone_token");
+            const response = await fetch(`http://localhost:5000/api/workouts/${editingWorkoutId}`, {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    workout_name: editingWorkoutName.trim(),
+                    workout_type: editingWorkoutType,
+                    duration: editingDuration ? Number(editingDuration) : null,
+                    workout_date: editingWorkoutDate || null,
+                }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                setWorkoutMessage(data.message || "Failed to update workout.");
+                return;
+            }
+
+            cancelEditWorkout();
+            setWorkoutMessage("Workout updated successfully! ✓");
+            await loadDashboard(token, false);
+        } catch (error) {
+            console.error("Update workout error:", error);
+            setWorkoutMessage("Unable to connect to the server.");
+        } finally {
+            setUpdatingWorkout(false);
+        }
+    }
+
+    function openWorkoutDeleteConfirm(workout) {
+        setWorkoutToDelete(workout);
+        setWorkoutDeleteMessage("");
+        setShowWorkoutDeleteConfirm(true);
+    }
+
+    function closeWorkoutDeleteConfirm() {
+        if (deletingWorkoutId) return;
+        setShowWorkoutDeleteConfirm(false);
+        setWorkoutToDelete(null);
+    }
+
+    async function handleDeleteWorkout() {
+        if (!workoutToDelete?.id) return;
+
+        try {
+            setDeletingWorkoutId(workoutToDelete.id);
+            const token = localStorage.getItem("fitzone_token");
+            const response = await fetch(`http://localhost:5000/api/workouts/${workoutToDelete.id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                setWorkoutDeleteMessage(data.message || "Failed to delete workout.");
+                return;
+            }
+
+            setShowWorkoutDeleteConfirm(false);
+            setWorkoutToDelete(null);
+            setWorkoutDeleteMessage("Workout deleted successfully! ✓");
+            await loadDashboard(token, false);
+        } catch (error) {
+            console.error("Delete workout error:", error);
+            setWorkoutDeleteMessage("Unable to connect to the server.");
+        } finally {
+            setDeletingWorkoutId(null);
+        }
+    }
+
+    async function handleUpdateProfile(event) {
+        event.preventDefault();
+        setProfileMessage("");
+
+        if (!profileName.trim()) {
+            setProfileMessage("Name is required.");
+            return;
+        }
+
+        if (!profileEmail.trim()) {
+            setProfileMessage("Email is required.");
+            return;
+        }
+
+        try {
+            setUpdatingProfile(true);
+            const token = localStorage.getItem("fitzone_token");
+
+            const response = await fetch("http://localhost:5000/api/profile", {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    name: profileName.trim(),
+                    email: profileEmail.trim(),
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setProfileMessage(data.message || "Failed to update profile.");
+                return;
+            }
+
+            const updatedUser = data.user;
+            setUser(updatedUser);
+            setProfileName(updatedUser.name || "");
+            setProfileEmail(updatedUser.email || "");
+            localStorage.setItem("fitzone_user", JSON.stringify(updatedUser));
+            setProfileMessage("Profile updated successfully! ✓");
+        } catch (error) {
+            console.error("Profile update error:", error);
+            setProfileMessage("Unable to connect to the server.");
+        } finally {
+            setUpdatingProfile(false);
+        }
+    }
+
+    async function handleChangePassword(event) {
+        event.preventDefault();
+        setPasswordMessage("");
+
+        if (!currentPassword) {
+            setPasswordMessage("Enter your current password.");
+            return;
+        }
+
+        if (!newPassword) {
+            setPasswordMessage("Enter a new password.");
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            setPasswordMessage("New password must be at least 6 characters.");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            setPasswordMessage("New passwords do not match.");
+            return;
+        }
+
+        try {
+            setChangingPassword(true);
+            const token = localStorage.getItem("fitzone_token");
+
+            const response = await fetch("http://localhost:5000/api/profile/password", {
+                method: "PUT",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    currentPassword,
+                    newPassword,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setPasswordMessage(data.message || "Failed to change password.");
+                return;
+            }
+
+            setCurrentPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+            setPasswordMessage("Password changed successfully! ✓");
+        } catch (error) {
+            console.error("Password change error:", error);
+            setPasswordMessage("Unable to connect to the server.");
+        } finally {
+            setChangingPassword(false);
         }
     }
 
@@ -243,7 +481,7 @@ function Dashboard() {
                 "Progress updated successfully! 💪"
             );
 
-            await loadDashboard(token);
+            await loadDashboard(token, false);
         } catch (error) {
             console.error(
                 "Progress update error:",
@@ -322,7 +560,7 @@ function Dashboard() {
                 "Membership updated successfully! 💪"
             );
 
-            await loadDashboard(token);
+            await loadDashboard(token, false);
         } catch (error) {
             console.error(
                 "Membership update error:",
@@ -374,6 +612,61 @@ function Dashboard() {
 
     const membershipStatus =
         membership?.status || "inactive";
+
+    const membershipDaysRemaining = membership?.end_date
+        ? Math.ceil(
+            (new Date(`${membership.end_date}T23:59:59`) - new Date())
+            / (1000 * 60 * 60 * 24)
+        )
+        : null;
+
+    const dashboardAlerts = [];
+
+    if (!membership) {
+        dashboardAlerts.push({
+            type: "info",
+            icon: "💳",
+            title: "No active membership",
+            text: "Update your membership details to keep your account information current.",
+            target: "membership-section",
+        });
+    } else if (membershipStatus !== "active") {
+        dashboardAlerts.push({
+            type: "warning",
+            icon: "⚠️",
+            title: "Membership is not active",
+            text: "Check your membership details below.",
+            target: "membership-section",
+        });
+    } else if (membershipDaysRemaining !== null && membershipDaysRemaining <= 7 && membershipDaysRemaining >= 0) {
+        dashboardAlerts.push({
+            type: "warning",
+            icon: "⏰",
+            title: "Membership ending soon",
+            text: `${membershipDaysRemaining} day${membershipDaysRemaining === 1 ? "" : "s"} remaining on your current membership.`,
+            target: "membership-section",
+        });
+    }
+
+    if (recentWorkouts.length === 0) {
+        dashboardAlerts.push({
+            type: "info",
+            icon: "🏋️",
+            title: "Start your workout history",
+            text: "You have not recorded a workout yet.",
+            target: "workout-section",
+        });
+    }
+
+    if (goal >= 100) {
+        dashboardAlerts.push({
+            type: "success",
+            icon: "🎯",
+            title: "Goal progress reached 100%",
+            text: "Your recorded goal progress has reached the target.",
+            target: "progress-section",
+        });
+    }
 
     function getWorkoutIcon(type) {
         const icons = {
@@ -465,6 +758,69 @@ function Dashboard() {
                             ?.charAt(0)
                             .toUpperCase()}
                     </div>
+
+                </section>
+
+                {/* DASHBOARD ALERTS */}
+
+                <section className="dashboard-alerts-section">
+
+                    <div className="dashboard-alerts-header">
+                        <div>
+                            <span>ATTENTION</span>
+                            <h2>Dashboard Alerts</h2>
+                        </div>
+
+                        <span className="activity-count">
+                            {dashboardAlerts.length > 0
+                                ? `${dashboardAlerts.length} alert${dashboardAlerts.length === 1 ? "" : "s"}`
+                                : "All clear"}
+                        </span>
+                    </div>
+
+                    {dashboardAlerts.length > 0 ? (
+                        <div className="dashboard-alerts-list">
+                            {dashboardAlerts.map((alert, index) => (
+                                <button
+                                    type="button"
+                                    className={`dashboard-alert ${alert.type}`}
+                                    key={`${alert.title}-${index}`}
+                                    onClick={() =>
+                                        document
+                                            .getElementById(alert.target)
+                                            ?.scrollIntoView({ behavior: "smooth" })
+                                    }
+                                >
+                                    <span className="dashboard-alert-icon">
+                                        {alert.icon}
+                                    </span>
+
+                                    <span className="dashboard-alert-content">
+                                        <strong>{alert.title}</strong>
+                                        <span>{alert.text}</span>
+                                    </span>
+
+                                    <span className="dashboard-alert-arrow">
+                                        →
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="dashboard-alerts-clear">
+                            <div className="dashboard-alerts-clear-icon">
+                                ✓
+                            </div>
+
+                            <div>
+                                <strong>You're all caught up</strong>
+                                <p>
+                                    Your membership, workouts, and progress
+                                    currently look good. Keep up the consistency!
+                                </p>
+                            </div>
+                        </div>
+                    )}
 
                 </section>
 
@@ -640,7 +996,7 @@ function Dashboard() {
 
                 {/* MEMBERSHIP */}
 
-                <section className="dashboard-section">
+                <section className="dashboard-section" id="membership-section">
 
                     <div className="section-heading">
                         <div>
@@ -893,6 +1249,254 @@ function Dashboard() {
 
                 </section>
 
+                {/* ACTIVITY CENTER */}
+
+                <section className="dashboard-section activity-center-section">
+                    <div className="section-heading">
+                        <div>
+                            <span>YOUR ACTIVITY</span>
+                            <h2>Activity Center</h2>
+                        </div>
+                        <span className="activity-count">
+                            {recentWorkouts.length} recent workouts
+                        </span>
+                    </div>
+
+                    <div className="activity-summary-grid">
+                        <div className="activity-summary-card">
+                            <div className="activity-summary-icon">🔥</div>
+                            <div>
+                                <span>LAST WORKOUT</span>
+                                <strong>
+                                    {recentWorkouts.length > 0
+                                        ? recentWorkouts[0].workout_name
+                                        : "No workout yet"}
+                                </strong>
+                                <small>
+                                    {recentWorkouts.length > 0
+                                        ? `${recentWorkouts[0].workout_type || "Workout"} • ${formatDate(recentWorkouts[0].workout_date)}`
+                                        : "Add your first workout to get started"}
+                                </small>
+                            </div>
+                        </div>
+
+                        <div className="activity-summary-card">
+                            <div className="activity-summary-icon">📈</div>
+                            <div>
+                                <span>GOAL PROGRESS</span>
+                                <strong>{goal}% complete</strong>
+                                <small>
+                                    {goal >= 100
+                                        ? "Goal completed"
+                                        : `${100 - goal}% remaining to reach your goal`}
+                                </small>
+                            </div>
+                        </div>
+
+                        <div className="activity-summary-card">
+                            <div className="activity-summary-icon">💳</div>
+                            <div>
+                                <span>MEMBERSHIP</span>
+                                <strong>
+                                    {membership?.plan || "No plan"}
+                                </strong>
+                                <small>
+                                    {membership?.end_date
+                                        ? `Ends ${formatDate(membership.end_date)}`
+                                        : "No end date recorded"}
+                                </small>
+                            </div>
+                        </div>
+
+                        <div className="activity-summary-card">
+                            <div className="activity-summary-icon">⚖️</div>
+                            <div>
+                                <span>CURRENT WEIGHT</span>
+                                <strong>
+                                    {progress?.weight
+                                        ? `${progress.weight} kg`
+                                        : "Not recorded"}
+                                </strong>
+                                <small>
+                                    {progress?.updated_at
+                                        ? `Updated ${new Date(progress.updated_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+                                        : "Update your progress to track it"}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="activity-timeline">
+                        <div className="activity-timeline-header">
+                            <div>
+                                <span>RECENT ACTIVITY</span>
+                                <h3>What you've been doing</h3>
+                            </div>
+                        </div>
+
+                        {recentWorkouts.length === 0 ? (
+                            <div className="activity-empty">
+                                <div className="activity-empty-icon">🏋️</div>
+                                <div>
+                                    <strong>Your activity will appear here</strong>
+                                    <p>Log a workout and your latest training activity will show up in this timeline.</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="activity-timeline-list">
+                                {recentWorkouts.slice(0, 4).map((workout) => (
+                                    <div className="activity-timeline-item" key={`activity-${workout.id}`}>
+                                        <div className="activity-timeline-dot">
+                                            {getWorkoutIcon(workout.workout_type)}
+                                        </div>
+                                        <div className="activity-timeline-content">
+                                            <strong>
+                                                {workout.workout_name}
+                                            </strong>
+                                            <span>
+                                                {workout.workout_type || "Workout"}
+                                                {workout.duration ? ` • ${workout.duration} min` : ""}
+                                            </span>
+                                        </div>
+                                        <time>
+                                            {formatDate(workout.workout_date)}
+                                        </time>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </section>
+
+                {/* PROFILE & SECURITY */}
+
+                <section className="dashboard-section profile-section">
+                    <div className="section-heading">
+                        <div>
+                            <span>ACCOUNT</span>
+                            <h2>Profile & Security</h2>
+                        </div>
+                    </div>
+
+                    <div className="profile-management-grid">
+                        <div className="profile-card">
+                            <div className="profile-card-header">
+                                <div className="profile-large-avatar">
+                                    {user.name?.charAt(0).toUpperCase()}
+                                </div>
+                                <div>
+                                    <span>YOUR ACCOUNT</span>
+                                    <h3>{user.name}</h3>
+                                    <p>{user.email}</p>
+                                </div>
+                            </div>
+
+                            <div className="profile-details-list">
+                                <div>
+                                    <span>ROLE</span>
+                                    <strong>{user.role || "member"}</strong>
+                                </div>
+                                <div>
+                                    <span>MEMBER SINCE</span>
+                                    <strong>
+                                        {user.created_at
+                                            ? new Date(user.created_at).toLocaleDateString("en-US", {
+                                                month: "short",
+                                                day: "numeric",
+                                                year: "numeric",
+                                            })
+                                            : "—"}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form className="dashboard-form profile-form" onSubmit={handleUpdateProfile}>
+                            <div className="profile-form-title">
+                                <span>PERSONAL INFORMATION</span>
+                                <h3>Edit Profile</h3>
+                            </div>
+
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label>Full Name</label>
+                                    <input
+                                        type="text"
+                                        value={profileName}
+                                        onChange={(event) => setProfileName(event.target.value)}
+                                        placeholder="Your name"
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>Email Address</label>
+                                    <input
+                                        type="email"
+                                        value={profileEmail}
+                                        onChange={(event) => setProfileEmail(event.target.value)}
+                                        placeholder="you@example.com"
+                                    />
+                                </div>
+                            </div>
+
+                            <button className="primary-btn" type="submit" disabled={updatingProfile}>
+                                {updatingProfile ? "Saving..." : "Save Profile →"}
+                            </button>
+
+                            {profileMessage && (
+                                <p className="form-message">{profileMessage}</p>
+                            )}
+                        </form>
+                    </div>
+
+                    <form className="dashboard-form password-form" onSubmit={handleChangePassword}>
+                        <div className="profile-form-title">
+                            <span>ACCOUNT SECURITY</span>
+                            <h3>Change Password</h3>
+                        </div>
+
+                        <div className="form-grid">
+                            <div className="form-group">
+                                <label>Current Password</label>
+                                <input
+                                    type="password"
+                                    value={currentPassword}
+                                    onChange={(event) => setCurrentPassword(event.target.value)}
+                                    placeholder="Enter current password"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>New Password</label>
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(event) => setNewPassword(event.target.value)}
+                                    placeholder="Minimum 6 characters"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Confirm New Password</label>
+                                <input
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(event) => setConfirmPassword(event.target.value)}
+                                    placeholder="Repeat new password"
+                                />
+                            </div>
+                        </div>
+
+                        <button className="primary-btn" type="submit" disabled={changingPassword}>
+                            {changingPassword ? "Changing..." : "Change Password →"}
+                        </button>
+
+                        {passwordMessage && (
+                            <p className="form-message">{passwordMessage}</p>
+                        )}
+                    </form>
+                </section>
+
                 {/* ADD WORKOUT */}
 
                 <section
@@ -1030,13 +1634,11 @@ function Dashboard() {
                 {/* RECENT WORKOUTS */}
 
                 <section className="dashboard-section">
-
                     <div className="section-heading">
                         <div>
                             <span>TRAINING HISTORY</span>
                             <h2>Recent Workouts</h2>
                         </div>
-
                         <span className="activity-count">
                             {recentWorkouts.length} recorded
                         </span>
@@ -1047,68 +1649,147 @@ function Dashboard() {
                             <div>🏋️</div>
                             <h3>No workouts yet</h3>
                             <p>
-                                Add your first workout to
-                                start building your training
-                                history.
+                                Add your first workout to start building your training history.
                             </p>
                         </div>
                     ) : (
                         <div className="workout-list">
-
-                            {recentWorkouts.map(
-                                (workout) => (
-                                    <div
-                                        className="workout-item"
-                                        key={workout.id}
-                                    >
-
-                                        <div className="workout-icon">
-                                            {getWorkoutIcon(
-                                                workout.workout_type
-                                            )}
-                                        </div>
-
-                                        <div className="workout-info">
-                                            <strong>
-                                                {
-                                                    workout.workout_name
-                                                }
-                                            </strong>
-
-                                            <span>
-                                                {
-                                                    workout.workout_type ||
-                                                    "Workout"
-                                                }
-                                            </span>
-                                        </div>
-
-                                        <div className="workout-meta">
-
-                                            <strong>
-                                                {workout.duration
-                                                    ? `${workout.duration} min`
-                                                    : "—"}
-                                            </strong>
-
-                                            <span>
-                                                {formatDate(
-                                                    workout.workout_date
-                                                )}
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-                                )
-                            )}
-
+                            {recentWorkouts.map((workout) => (
+                                <div className="workout-item dashboard-workout-item" key={workout.id}>
+                                    {editingWorkoutId === workout.id ? (
+                                        <form className="dashboard-workout-edit" onSubmit={handleUpdateWorkout}>
+                                            <div className="workout-icon">
+                                                {getWorkoutIcon(workout.workout_type)}
+                                            </div>
+                                            <div className="dashboard-workout-edit-grid">
+                                                <input
+                                                    value={editingWorkoutName}
+                                                    onChange={(event) => setEditingWorkoutName(event.target.value)}
+                                                    placeholder="Workout name"
+                                                />
+                                                <select
+                                                    value={editingWorkoutType}
+                                                    onChange={(event) => setEditingWorkoutType(event.target.value)}
+                                                >
+                                                    <option value="Strength">Strength</option>
+                                                    <option value="Cardio">Cardio</option>
+                                                    <option value="Chest">Chest</option>
+                                                    <option value="Back">Back</option>
+                                                    <option value="Legs">Legs</option>
+                                                    <option value="Shoulders">Shoulders</option>
+                                                    <option value="Arms">Arms</option>
+                                                    <option value="Full Body">Full Body</option>
+                                                </select>
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    value={editingDuration}
+                                                    onChange={(event) => setEditingDuration(event.target.value)}
+                                                    placeholder="Minutes"
+                                                />
+                                                <input
+                                                    type="date"
+                                                    value={editingWorkoutDate}
+                                                    onChange={(event) => setEditingWorkoutDate(event.target.value)}
+                                                />
+                                                <div className="dashboard-workout-edit-actions">
+                                                    <button className="dashboard-save-btn" disabled={updatingWorkout}>
+                                                        {updatingWorkout ? "Saving..." : "Save"}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="dashboard-cancel-btn"
+                                                        onClick={cancelEditWorkout}
+                                                        disabled={updatingWorkout}
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    ) : (
+                                        <>
+                                            <div className="workout-icon">
+                                                {getWorkoutIcon(workout.workout_type)}
+                                            </div>
+                                            <div className="workout-info">
+                                                <strong>{workout.workout_name}</strong>
+                                                <span>{workout.workout_type || "Workout"}</span>
+                                            </div>
+                                            <div className="workout-meta">
+                                                <strong>
+                                                    {workout.duration ? `${workout.duration} min` : "—"}
+                                                </strong>
+                                                <span>{formatDate(workout.workout_date)}</span>
+                                            </div>
+                                            <div className="dashboard-workout-actions">
+                                                <button
+                                                    type="button"
+                                                    className="dashboard-edit-btn"
+                                                    onClick={() => startEditWorkout(workout)}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="dashboard-delete-btn"
+                                                    onClick={() => openWorkoutDeleteConfirm(workout)}
+                                                    disabled={deletingWorkoutId === workout.id}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     )}
 
+                    {workoutMessage && (
+                        <p className="form-message">{workoutMessage}</p>
+                    )}
+
+                    {workoutDeleteMessage && (
+                        <p className="form-message">{workoutDeleteMessage}</p>
+                    )}
                 </section>
 
             </main>
+
+            {showWorkoutDeleteConfirm && (
+                <div className="dashboard-modal-overlay" onClick={closeWorkoutDeleteConfirm}>
+                    <div
+                        className="dashboard-delete-modal"
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <div className="dashboard-delete-icon">⚠️</div>
+                        <span>WORKOUT ACTION</span>
+                        <h2>Delete Workout?</h2>
+                        <p>
+                            Are you sure you want to delete <strong>{workoutToDelete?.workout_name}</strong>?
+                        </p>
+                        <div className="dashboard-delete-actions">
+                            <button
+                                type="button"
+                                className="dashboard-cancel-delete"
+                                onClick={closeWorkoutDeleteConfirm}
+                                disabled={!!deletingWorkoutId}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                className="dashboard-confirm-delete"
+                                onClick={handleDeleteWorkout}
+                                disabled={!!deletingWorkoutId}
+                            >
+                                {deletingWorkoutId ? "Deleting..." : "Yes, Delete"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

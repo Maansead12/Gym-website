@@ -1,16 +1,47 @@
 const express = require("express");
 
-const authenticateToken = require("../middleware/authMiddleware");
-
 const {
-    getWorkouts,
     addWorkout,
+    updateWorkout,
+    deleteWorkout,
 } = require("../controllers/workoutController");
+
+const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.get("/", authenticateToken, getWorkouts);
 
-router.post("/", authenticateToken, addWorkout);
+// ===============================
+// ADD WORKOUT
+// POST /api/workouts
+// ===============================
+router.post(
+    "/",
+    authMiddleware,
+    addWorkout
+);
+
+
+// ===============================
+// UPDATE WORKOUT
+// PUT /api/workouts/:id
+// ===============================
+router.put(
+    "/:id",
+    authMiddleware,
+    updateWorkout
+);
+
+
+// ===============================
+// DELETE WORKOUT
+// DELETE /api/workouts/:id
+// ===============================
+router.delete(
+    "/:id",
+    authMiddleware,
+    deleteWorkout
+);
+
 
 module.exports = router;
