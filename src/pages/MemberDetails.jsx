@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./MemberDetails.css";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function MemberDetails() {
     const navigate = useNavigate();
@@ -43,7 +45,7 @@ function MemberDetails() {
             const token = localStorage.getItem("fitzone_token");
 
             const response = await fetch(
-                `http://localhost:5000/api/admin/members/${id}/workouts`,
+                `${API_URL}/api/admin/members/${id}/workouts`,
                 {
                     method: "POST",
                     headers: {
@@ -66,7 +68,7 @@ function MemberDetails() {
                 return;
             }
 
-            setWorkoutMessage("Workout added successfully! ✓");
+            setWorkoutMessage("Workout added successfully! âœ“");
             setWorkoutName("");
             setWorkoutType("Strength");
             setWorkoutDuration("");
@@ -113,7 +115,7 @@ function MemberDetails() {
             const token = localStorage.getItem("fitzone_token");
 
             const response = await fetch(
-                `http://localhost:5000/api/admin/workouts/${editingWorkoutId}`,
+                `${API_URL}/api/admin/workouts/${editingWorkoutId}`,
                 {
                     method: "PUT",
                     headers: {
@@ -140,7 +142,7 @@ function MemberDetails() {
                 return;
             }
 
-            setEditingWorkoutMessage("Workout updated successfully! ✓");
+            setEditingWorkoutMessage("Workout updated successfully! âœ“");
             await loadMemberDetails(token, false);
 
             setTimeout(() => {
@@ -181,7 +183,7 @@ function MemberDetails() {
             const token = localStorage.getItem("fitzone_token");
 
             const response = await fetch(
-                `http://localhost:5000/api/admin/workouts/${workoutToDelete.id}`,
+                `${API_URL}/api/admin/workouts/${workoutToDelete.id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -206,7 +208,7 @@ function MemberDetails() {
 
             setShowWorkoutDeleteConfirm(false);
             setWorkoutToDelete(null);
-            setWorkoutDeleteMessage("Workout deleted successfully! ✓");
+            setWorkoutDeleteMessage("Workout deleted successfully! âœ“");
 
             await loadMemberDetails(token, false);
         } catch (error) {
@@ -311,7 +313,7 @@ function MemberDetails() {
             setError("");
 
             const response = await fetch(
-                `http://localhost:5000/api/admin/members/${id}`,
+                `${API_URL}/api/admin/members/${id}`,
                 {
                     method: "GET",
                     headers: {
@@ -444,7 +446,7 @@ function MemberDetails() {
                 );
 
             const response = await fetch(
-                `http://localhost:5000/api/admin/members/${id}`,
+                `${API_URL}/api/admin/members/${id}`,
                 {
                     method: "PUT",
                     headers: {
@@ -495,7 +497,7 @@ function MemberDetails() {
             setEditRole(data.member.role);
 
             setEditMessage(
-                "Member updated successfully! ✓"
+                "Member updated successfully! âœ“"
             );
         } catch (error) {
             console.error(
@@ -560,7 +562,7 @@ function MemberDetails() {
                 );
 
             const response = await fetch(
-                `http://localhost:5000/api/admin/members/${id}/membership`,
+                `${API_URL}/api/admin/members/${id}/membership`,
                 {
                     method: "PUT",
                     headers: {
@@ -622,7 +624,7 @@ function MemberDetails() {
             );
 
             setMembershipMessage(
-                "Membership updated successfully! ✓"
+                "Membership updated successfully! âœ“"
             );
         } catch (error) {
             console.error(
@@ -689,7 +691,7 @@ function MemberDetails() {
                 );
 
             const response = await fetch(
-                `http://localhost:5000/api/admin/members/${id}/progress`,
+                `${API_URL}/api/admin/members/${id}/progress`,
                 {
                     method: "PUT",
                     headers: {
@@ -762,7 +764,7 @@ function MemberDetails() {
             );
 
             setProgressMessage(
-                "Progress updated successfully! ✓"
+                "Progress updated successfully! âœ“"
             );
         } catch (error) {
             console.error(
@@ -794,7 +796,7 @@ function MemberDetails() {
                 );
 
             const response = await fetch(
-                `http://localhost:5000/api/admin/members/${id}`,
+                `${API_URL}/api/admin/members/${id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -888,14 +890,14 @@ function MemberDetails() {
         const value =
             type?.toLowerCase() || "";
 
-        if (value.includes("cardio")) return "🏃";
-        if (value.includes("strength")) return "🏋️";
-        if (value.includes("legs")) return "🦵";
-        if (value.includes("chest")) return "💪";
-        if (value.includes("back")) return "🔩";
-        if (value.includes("yoga")) return "🧘";
+        if (value.includes("cardio")) return "ðŸƒ";
+        if (value.includes("strength")) return "ðŸ‹ï¸";
+        if (value.includes("legs")) return "ðŸ¦µ";
+        if (value.includes("chest")) return "ðŸ’ª";
+        if (value.includes("back")) return "ðŸ”©";
+        if (value.includes("yoga")) return "ðŸ§˜";
 
-        return "🏋️";
+        return "ðŸ‹ï¸";
     }
 
     /* =========================
@@ -955,7 +957,7 @@ function MemberDetails() {
                             navigate("/admin")
                         }
                     >
-                        ← Back to Members
+                        â† Back to Members
                     </button>
 
                     <span className="profile-reference">
@@ -983,7 +985,7 @@ function MemberDetails() {
                             </span>
 
                             <span className="meta-dot">
-                                •
+                                â€¢
                             </span>
 
                             <span>
@@ -1013,7 +1015,7 @@ function MemberDetails() {
 
                     <div className="overview-card">
                         <span className="overview-icon">
-                            👤
+                            ðŸ‘¤
                         </span>
 
                         <div>
@@ -1032,7 +1034,7 @@ function MemberDetails() {
 
                     <div className="overview-card">
                         <span className="overview-icon">
-                            🏆
+                            ðŸ†
                         </span>
 
                         <div>
@@ -1049,7 +1051,7 @@ function MemberDetails() {
 
                     <div className="overview-card">
                         <span className="overview-icon">
-                            📈
+                            ðŸ“ˆ
                         </span>
 
                         <div>
@@ -1065,7 +1067,7 @@ function MemberDetails() {
 
                     <div className="overview-card">
                         <span className="overview-icon">
-                            🏋️
+                            ðŸ‹ï¸
                         </span>
 
                         <div>
@@ -1271,7 +1273,7 @@ function MemberDetails() {
                         >
                             {updatingMember
                                 ? "Updating..."
-                                : "Save Changes →"}
+                                : "Save Changes â†’"}
                         </button>
                     </form>
 
@@ -1416,7 +1418,7 @@ function MemberDetails() {
                         >
                             {updatingMembership
                                 ? "Saving Membership..."
-                                : "Save Membership →"}
+                                : "Save Membership â†’"}
                         </button>
                     </form>
 
@@ -1543,7 +1545,7 @@ function MemberDetails() {
                         >
                             {updatingProgress
                                 ? "Saving Progress..."
-                                : "Save Progress →"}
+                                : "Save Progress â†’"}
                         </button>
                     </form>
 
@@ -1825,7 +1827,7 @@ function MemberDetails() {
                             type="submit"
                             disabled={addingWorkout}
                         >
-                            {addingWorkout ? "Adding Workout..." : "Add Workout →"}
+                            {addingWorkout ? "Adding Workout..." : "Add Workout â†’"}
                         </button>
                     </form>
 
@@ -1944,7 +1946,7 @@ function MemberDetails() {
                                                 <p>
                                                     {workout.workout_type || "Workout"}
                                                     {workout.duration
-                                                        ? ` • ${workout.duration} min`
+                                                        ? ` â€¢ ${workout.duration} min`
                                                         : ""}
                                                 </p>
                                                 <span>{formatDate(workout.workout_date)}</span>
@@ -1953,7 +1955,7 @@ function MemberDetails() {
                                             <div className="workout-duration">
                                                 {workout.duration
                                                     ? `${workout.duration} min`
-                                                    : "—"}
+                                                    : "â€”"}
                                             </div>
 
                                             <div className="workout-admin-actions">
@@ -2036,7 +2038,7 @@ function MemberDetails() {
                 <div className="delete-modal-overlay">
                     <div className="delete-modal workout-delete-modal">
                         <div className="delete-modal-icon">
-                            ⚠️
+                            âš ï¸
                         </div>
 
                         <span className="modal-label">
@@ -2099,7 +2101,7 @@ function MemberDetails() {
                 <div className="delete-modal-overlay">
                     <div className="delete-modal">
                         <div className="delete-modal-icon">
-                            ⚠️
+                            âš ï¸
                         </div>
 
                         <span className="modal-label">
@@ -2163,3 +2165,4 @@ function MemberDetails() {
 }
 
 export default MemberDetails;
+

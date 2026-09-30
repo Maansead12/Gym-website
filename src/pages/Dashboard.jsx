@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Dashboard() {
     const navigate = useNavigate();
@@ -84,7 +86,7 @@ function Dashboard() {
             setError("");
 
             const response = await fetch(
-                "http://localhost:5000/api/dashboard",
+                "${API_URL}/api/dashboard",
                 {
                     method: "GET",
                     headers: {
@@ -163,7 +165,7 @@ function Dashboard() {
             const token = localStorage.getItem("fitzone_token");
 
             const response = await fetch(
-                "http://localhost:5000/api/workouts",
+                "${API_URL}/api/workouts",
                 {
                     method: "POST",
                     headers: {
@@ -191,7 +193,7 @@ function Dashboard() {
             }
 
             setWorkoutMessage(
-                "Workout added successfully! 💪"
+                "Workout added successfully! ðŸ’ª"
             );
 
             setWorkoutName("");
@@ -243,7 +245,7 @@ function Dashboard() {
         try {
             setUpdatingWorkout(true);
             const token = localStorage.getItem("fitzone_token");
-            const response = await fetch(`http://localhost:5000/api/workouts/${editingWorkoutId}`, {
+            const response = await fetch(`${API_URL}/api/workouts/${editingWorkoutId}`, {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -264,7 +266,7 @@ function Dashboard() {
             }
 
             cancelEditWorkout();
-            setWorkoutMessage("Workout updated successfully! ✓");
+            setWorkoutMessage("Workout updated successfully! âœ“");
             await loadDashboard(token, false);
         } catch (error) {
             console.error("Update workout error:", error);
@@ -292,7 +294,7 @@ function Dashboard() {
         try {
             setDeletingWorkoutId(workoutToDelete.id);
             const token = localStorage.getItem("fitzone_token");
-            const response = await fetch(`http://localhost:5000/api/workouts/${workoutToDelete.id}`, {
+            const response = await fetch(`${API_URL}/api/workouts/${workoutToDelete.id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -308,7 +310,7 @@ function Dashboard() {
 
             setShowWorkoutDeleteConfirm(false);
             setWorkoutToDelete(null);
-            setWorkoutDeleteMessage("Workout deleted successfully! ✓");
+            setWorkoutDeleteMessage("Workout deleted successfully! âœ“");
             await loadDashboard(token, false);
         } catch (error) {
             console.error("Delete workout error:", error);
@@ -336,7 +338,7 @@ function Dashboard() {
             setUpdatingProfile(true);
             const token = localStorage.getItem("fitzone_token");
 
-            const response = await fetch("http://localhost:5000/api/profile", {
+            const response = await fetch("${API_URL}/api/profile", {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -360,7 +362,7 @@ function Dashboard() {
             setProfileName(updatedUser.name || "");
             setProfileEmail(updatedUser.email || "");
             localStorage.setItem("fitzone_user", JSON.stringify(updatedUser));
-            setProfileMessage("Profile updated successfully! ✓");
+            setProfileMessage("Profile updated successfully! âœ“");
         } catch (error) {
             console.error("Profile update error:", error);
             setProfileMessage("Unable to connect to the server.");
@@ -397,7 +399,7 @@ function Dashboard() {
             setChangingPassword(true);
             const token = localStorage.getItem("fitzone_token");
 
-            const response = await fetch("http://localhost:5000/api/profile/password", {
+            const response = await fetch("${API_URL}/api/profile/password", {
                 method: "PUT",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -419,7 +421,7 @@ function Dashboard() {
             setCurrentPassword("");
             setNewPassword("");
             setConfirmPassword("");
-            setPasswordMessage("Password changed successfully! ✓");
+            setPasswordMessage("Password changed successfully! âœ“");
         } catch (error) {
             console.error("Password change error:", error);
             setPasswordMessage("Unable to connect to the server.");
@@ -449,7 +451,7 @@ function Dashboard() {
             const token = localStorage.getItem("fitzone_token");
 
             const response = await fetch(
-                "http://localhost:5000/api/progress",
+                "${API_URL}/api/progress",
                 {
                     method: "PUT",
                     headers: {
@@ -478,7 +480,7 @@ function Dashboard() {
             }
 
             setProgressMessage(
-                "Progress updated successfully! 💪"
+                "Progress updated successfully! ðŸ’ª"
             );
 
             await loadDashboard(token, false);
@@ -530,7 +532,7 @@ function Dashboard() {
             const token = localStorage.getItem("fitzone_token");
 
             const response = await fetch(
-                "http://localhost:5000/api/memberships",
+                "${API_URL}/api/memberships",
                 {
                     method: "POST",
                     headers: {
@@ -557,7 +559,7 @@ function Dashboard() {
             }
 
             setMembershipMessage(
-                "Membership updated successfully! 💪"
+                "Membership updated successfully! ðŸ’ª"
             );
 
             await loadDashboard(token, false);
@@ -625,7 +627,7 @@ function Dashboard() {
     if (!membership) {
         dashboardAlerts.push({
             type: "info",
-            icon: "💳",
+            icon: "ðŸ’³",
             title: "No active membership",
             text: "Update your membership details to keep your account information current.",
             target: "membership-section",
@@ -633,7 +635,7 @@ function Dashboard() {
     } else if (membershipStatus !== "active") {
         dashboardAlerts.push({
             type: "warning",
-            icon: "⚠️",
+            icon: "âš ï¸",
             title: "Membership is not active",
             text: "Check your membership details below.",
             target: "membership-section",
@@ -641,7 +643,7 @@ function Dashboard() {
     } else if (membershipDaysRemaining !== null && membershipDaysRemaining <= 7 && membershipDaysRemaining >= 0) {
         dashboardAlerts.push({
             type: "warning",
-            icon: "⏰",
+            icon: "â°",
             title: "Membership ending soon",
             text: `${membershipDaysRemaining} day${membershipDaysRemaining === 1 ? "" : "s"} remaining on your current membership.`,
             target: "membership-section",
@@ -651,7 +653,7 @@ function Dashboard() {
     if (recentWorkouts.length === 0) {
         dashboardAlerts.push({
             type: "info",
-            icon: "🏋️",
+            icon: "ðŸ‹ï¸",
             title: "Start your workout history",
             text: "You have not recorded a workout yet.",
             target: "workout-section",
@@ -661,7 +663,7 @@ function Dashboard() {
     if (goal >= 100) {
         dashboardAlerts.push({
             type: "success",
-            icon: "🎯",
+            icon: "ðŸŽ¯",
             title: "Goal progress reached 100%",
             text: "Your recorded goal progress has reached the target.",
             target: "progress-section",
@@ -670,21 +672,21 @@ function Dashboard() {
 
     function getWorkoutIcon(type) {
         const icons = {
-            Chest: "💪",
-            Back: "🏋️",
-            Legs: "🦵",
-            Shoulders: "🏋️",
-            Arms: "💪",
-            Cardio: "🏃",
-            Strength: "🔥",
-            "Full Body": "⚡",
+            Chest: "ðŸ’ª",
+            Back: "ðŸ‹ï¸",
+            Legs: "ðŸ¦µ",
+            Shoulders: "ðŸ‹ï¸",
+            Arms: "ðŸ’ª",
+            Cardio: "ðŸƒ",
+            Strength: "ðŸ”¥",
+            "Full Body": "âš¡",
         };
 
-        return icons[type] || "🏋️";
+        return icons[type] || "ðŸ‹ï¸";
     }
 
     function formatDate(date) {
-        if (!date) return "—";
+        if (!date) return "â€”";
 
         return new Date(
             `${date}T00:00:00`
@@ -801,7 +803,7 @@ function Dashboard() {
                                     </span>
 
                                     <span className="dashboard-alert-arrow">
-                                        →
+                                        â†’
                                     </span>
                                 </button>
                             ))}
@@ -809,7 +811,7 @@ function Dashboard() {
                     ) : (
                         <div className="dashboard-alerts-clear">
                             <div className="dashboard-alerts-clear-icon">
-                                ✓
+                                âœ“
                             </div>
 
                             <div>
@@ -830,7 +832,7 @@ function Dashboard() {
 
                     <div className="overview-card">
                         <div className="overview-icon membership-icon">
-                            💳
+                            ðŸ’³
                         </div>
 
                         <div>
@@ -856,7 +858,7 @@ function Dashboard() {
 
                     <div className="overview-card">
                         <div className="overview-icon workout-icon">
-                            🏋️
+                            ðŸ‹ï¸
                         </div>
 
                         <div>
@@ -874,7 +876,7 @@ function Dashboard() {
 
                     <div className="overview-card">
                         <div className="overview-icon progress-icon">
-                            📈
+                            ðŸ“ˆ
                         </div>
 
                         <div>
@@ -892,7 +894,7 @@ function Dashboard() {
 
                     <div className="overview-card">
                         <div className="overview-icon weight-icon">
-                            ⚖️
+                            âš–ï¸
                         </div>
 
                         <div>
@@ -901,7 +903,7 @@ function Dashboard() {
                             <strong>
                                 {progress?.weight
                                     ? `${progress.weight}`
-                                    : "—"}
+                                    : "â€”"}
                             </strong>
 
                             <small>
@@ -978,7 +980,7 @@ function Dashboard() {
                                     ? new Date(
                                         user.created_at
                                     ).toLocaleDateString()
-                                    : "—"}
+                                    : "â€”"}
                             </strong>
                         </div>
 
@@ -1140,7 +1142,7 @@ function Dashboard() {
                             >
                                 {updatingMembership
                                     ? "Updating..."
-                                    : "Update Membership →"}
+                                    : "Update Membership â†’"}
                             </button>
 
                             {membershipMessage && (
@@ -1236,7 +1238,7 @@ function Dashboard() {
                         >
                             {updatingProgress
                                 ? "Updating..."
-                                : "Save Progress →"}
+                                : "Save Progress â†’"}
                         </button>
 
                         {progressMessage && (
@@ -1264,7 +1266,7 @@ function Dashboard() {
 
                     <div className="activity-summary-grid">
                         <div className="activity-summary-card">
-                            <div className="activity-summary-icon">🔥</div>
+                            <div className="activity-summary-icon">ðŸ”¥</div>
                             <div>
                                 <span>LAST WORKOUT</span>
                                 <strong>
@@ -1274,14 +1276,14 @@ function Dashboard() {
                                 </strong>
                                 <small>
                                     {recentWorkouts.length > 0
-                                        ? `${recentWorkouts[0].workout_type || "Workout"} • ${formatDate(recentWorkouts[0].workout_date)}`
+                                        ? `${recentWorkouts[0].workout_type || "Workout"} â€¢ ${formatDate(recentWorkouts[0].workout_date)}`
                                         : "Add your first workout to get started"}
                                 </small>
                             </div>
                         </div>
 
                         <div className="activity-summary-card">
-                            <div className="activity-summary-icon">📈</div>
+                            <div className="activity-summary-icon">ðŸ“ˆ</div>
                             <div>
                                 <span>GOAL PROGRESS</span>
                                 <strong>{goal}% complete</strong>
@@ -1294,7 +1296,7 @@ function Dashboard() {
                         </div>
 
                         <div className="activity-summary-card">
-                            <div className="activity-summary-icon">💳</div>
+                            <div className="activity-summary-icon">ðŸ’³</div>
                             <div>
                                 <span>MEMBERSHIP</span>
                                 <strong>
@@ -1309,7 +1311,7 @@ function Dashboard() {
                         </div>
 
                         <div className="activity-summary-card">
-                            <div className="activity-summary-icon">⚖️</div>
+                            <div className="activity-summary-icon">âš–ï¸</div>
                             <div>
                                 <span>CURRENT WEIGHT</span>
                                 <strong>
@@ -1336,7 +1338,7 @@ function Dashboard() {
 
                         {recentWorkouts.length === 0 ? (
                             <div className="activity-empty">
-                                <div className="activity-empty-icon">🏋️</div>
+                                <div className="activity-empty-icon">ðŸ‹ï¸</div>
                                 <div>
                                     <strong>Your activity will appear here</strong>
                                     <p>Log a workout and your latest training activity will show up in this timeline.</p>
@@ -1355,7 +1357,7 @@ function Dashboard() {
                                             </strong>
                                             <span>
                                                 {workout.workout_type || "Workout"}
-                                                {workout.duration ? ` • ${workout.duration} min` : ""}
+                                                {workout.duration ? ` â€¢ ${workout.duration} min` : ""}
                                             </span>
                                         </div>
                                         <time>
@@ -1405,7 +1407,7 @@ function Dashboard() {
                                                 day: "numeric",
                                                 year: "numeric",
                                             })
-                                            : "—"}
+                                            : "â€”"}
                                     </strong>
                                 </div>
                             </div>
@@ -1440,7 +1442,7 @@ function Dashboard() {
                             </div>
 
                             <button className="primary-btn" type="submit" disabled={updatingProfile}>
-                                {updatingProfile ? "Saving..." : "Save Profile →"}
+                                {updatingProfile ? "Saving..." : "Save Profile â†’"}
                             </button>
 
                             {profileMessage && (
@@ -1488,7 +1490,7 @@ function Dashboard() {
                         </div>
 
                         <button className="primary-btn" type="submit" disabled={changingPassword}>
-                            {changingPassword ? "Changing..." : "Change Password →"}
+                            {changingPassword ? "Changing..." : "Change Password â†’"}
                         </button>
 
                         {passwordMessage && (
@@ -1618,7 +1620,7 @@ function Dashboard() {
                         >
                             {addingWorkout
                                 ? "Adding Workout..."
-                                : "Add Workout →"}
+                                : "Add Workout â†’"}
                         </button>
 
                         {workoutMessage && (
@@ -1646,7 +1648,7 @@ function Dashboard() {
 
                     {recentWorkouts.length === 0 ? (
                         <div className="empty-state">
-                            <div>🏋️</div>
+                            <div>ðŸ‹ï¸</div>
                             <h3>No workouts yet</h3>
                             <p>
                                 Add your first workout to start building your training history.
@@ -1718,7 +1720,7 @@ function Dashboard() {
                                             </div>
                                             <div className="workout-meta">
                                                 <strong>
-                                                    {workout.duration ? `${workout.duration} min` : "—"}
+                                                    {workout.duration ? `${workout.duration} min` : "â€”"}
                                                 </strong>
                                                 <span>{formatDate(workout.workout_date)}</span>
                                             </div>
@@ -1763,7 +1765,7 @@ function Dashboard() {
                         className="dashboard-delete-modal"
                         onClick={(event) => event.stopPropagation()}
                     >
-                        <div className="dashboard-delete-icon">⚠️</div>
+                        <div className="dashboard-delete-icon">âš ï¸</div>
                         <span>WORKOUT ACTION</span>
                         <h2>Delete Workout?</h2>
                         <p>
@@ -1795,3 +1797,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+

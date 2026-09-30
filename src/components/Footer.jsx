@@ -30,7 +30,7 @@ function Footer() {
           <h3>Contact</h3>
 
           <p>📍 Bhubaneswar, India</p>
-          <p>📞 +91 9876543210</p>
+          <p>📞 +91 8658184024</p>
           <p>✉ fitzone@gmail.com</p>
         </div>
 

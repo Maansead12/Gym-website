@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AdminDashboard.css";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function AdminDashboard() {
     const navigate = useNavigate();
@@ -48,7 +50,7 @@ function AdminDashboard() {
             const [membersResponse, statsResponse] =
                 await Promise.all([
                     fetch(
-                        "http://localhost:5000/api/admin/members",
+                        "${API_URL}/api/admin/members",
                         {
                             method: "GET",
                             headers: {
@@ -59,7 +61,7 @@ function AdminDashboard() {
                     ),
 
                     fetch(
-                        "http://localhost:5000/api/admin/stats",
+                        "${API_URL}/api/admin/stats",
                         {
                             method: "GET",
                             headers: {
@@ -218,7 +220,7 @@ function AdminDashboard() {
 
                     <div className="admin-stat-card">
                         <span className="admin-stat-icon">
-                            👥
+                            ðŸ‘¥
                         </span>
 
                         <h3>Total Users</h3>
@@ -234,7 +236,7 @@ function AdminDashboard() {
 
                     <div className="admin-stat-card">
                         <span className="admin-stat-icon">
-                            🟢
+                            ðŸŸ¢
                         </span>
 
                         <h3>Active Memberships</h3>
@@ -250,7 +252,7 @@ function AdminDashboard() {
 
                     <div className="admin-stat-card">
                         <span className="admin-stat-icon">
-                            🏋️
+                            ðŸ‹ï¸
                         </span>
 
                         <h3>Total Workouts</h3>
@@ -266,7 +268,7 @@ function AdminDashboard() {
 
                     <div className="admin-stat-card">
                         <span className="admin-stat-icon">
-                            📈
+                            ðŸ“ˆ
                         </span>
 
                         <h3>Progress Tracking</h3>
@@ -344,7 +346,7 @@ function AdminDashboard() {
                                                 )
                                             }
                                         >
-                                            View →
+                                            View â†’
                                         </button>
                                     </div>
                                 )
@@ -377,7 +379,7 @@ function AdminDashboard() {
                     <div className="members-controls">
 
                         <div className="member-search">
-                            <span>🔎</span>
+                            <span>ðŸ”Ž</span>
 
                             <input
                                 type="text"
@@ -520,7 +522,7 @@ function AdminDashboard() {
                                                             )
                                                         }
                                                     >
-                                                        View →
+                                                        View â†’
                                                     </button>
                                                 </td>
                                             </tr>
@@ -541,3 +543,4 @@ function AdminDashboard() {
 }
 
 export default AdminDashboard;
+

@@ -1,6 +1,8 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link } from "react-router-dom";
 import "./Signup.css";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Signup() {
     const [name, setName] = useState("");
@@ -33,7 +35,7 @@ function Signup() {
             setIsLoading(true);
 
             const response = await fetch(
-                "http://localhost:5000/api/auth/signup",
+                "${API_URL}/api/auth/signup",
                 {
                     method: "POST",
                     headers: {
@@ -54,7 +56,7 @@ function Signup() {
                 return;
             }
 
-            setMessage("Account created successfully! 💪");
+            setMessage("Account created successfully! ðŸ’ª");
 
             setName("");
             setEmail("");
@@ -164,7 +166,7 @@ function Signup() {
                         >
                             {isLoading
                                 ? "Creating Account..."
-                                : "Create Account →"}
+                                : "Create Account â†’"}
                         </button>
 
                     </form>
@@ -193,3 +195,4 @@ function Signup() {
 }
 
 export default Signup;
+
